@@ -473,6 +473,7 @@ h3.sec{margin:18px 4px 10px;font-size:18px;font-weight:800;color:var(--ink)}
 
 h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .mode.s{background:linear-gradient(135deg,#14b8a6,#0f766e)}
+.mode.m{background:linear-gradient(135deg,#f59e0b,#c2410c)}
 .mode.r{background:linear-gradient(135deg,#ec4899,#be185d)}
 .sayprog{height:10px;border-radius:99px;background:color-mix(in srgb,var(--h) 15%,#fff);overflow:hidden;margin:2px 4px 12px}
 .sayprog i{display:block;height:100%;background:var(--h);border-radius:99px;transition:width .4s}
@@ -633,7 +634,7 @@ function normState(d){
   var s=freshState();if(!d||typeof d!=='object')return s;
   s.wallet=Math.max(0,Math.floor(+d.wallet||0));s.total=Math.max(0,Math.floor(+d.total||0));
   s.seq=Math.floor(+d.seq||0);s.upd=+d.upd||0;
-  if(d.best&&typeof d.best==='object'){for(var k in d.best){var v=Math.floor(+d.best[k]||0);if(v>0&&/^(\d+|e-[a-z0-9]+):[kozbxsr]$/.test(k))s.best[k]=Math.min(3,v);}}
+  if(d.best&&typeof d.best==='object'){for(var k in d.best){var v=Math.floor(+d.best[k]||0);if(v>0&&/^(\d+|e-[a-z0-9]+):[kozbxsrm]$/.test(k))s.best[k]=Math.min(3,v);}}
   if(Array.isArray(d.garden)){
     s.garden=d.garden.filter(function(g){return g&&ITEM[g.t];}).slice(0,60).map(function(g){
       return {id:String(g.id||('g'+(++s.seq))),t:g.t,x:clamp(+g.x||50,3,97),y:clamp(+g.y||70,4,98)};
@@ -1811,8 +1812,9 @@ function finishEn(gi,m,base,line){
   ST.wallet+=earn;ST.total+=earn;saveState();
   if(Z){clearTimeout(Z.timer);clearTimeout(Z.nt);}
   var h='<div class="res-stars">';for(var k=0;k<3;k++)h+='<span class="st'+(k<base?' on':'')+'" style="animation-delay:'+(0.25+k*0.25)+'s">★</span>';
-  var ord=enOrder(t),mi=ord.indexOf(m),next,spk=m==='s'||m==='r';
-  if(spk)next=(m==='s'&&sayModes(t).indexOf('r')>=0)?'<button class="rbtn" data-act="ensayst" data-g="'+gi+'" data-m="r"><span class="em">'+MODES.r.em+'</span>'+MODES.r.n+'</button>':'<button class="rbtn" data-act="enlearn" data-g="'+gi+'"><span class="em">👀</span>Öğren</button>';
+  var ord=enOrder(t),mi=ord.indexOf(m),next,spk=m==='s'||m==='m'||m==='r';
+  var so=sayModes(t),si=so.indexOf(m);
+  if(spk)next=si>=0&&si<so.length-1?'<button class="rbtn" data-act="ensayst" data-g="'+gi+'" data-m="'+so[si+1]+'"><span class="em">'+MODES[so[si+1]].em+'</span>'+MODES[so[si+1]].n+'</button>':'<button class="rbtn" data-act="enlearn" data-g="'+gi+'"><span class="em">👀</span>Öğren</button>';
   else if(mi<ord.length-1)next='<button class="rbtn" data-act="enstart" data-g="'+gi+'" data-m="'+ord[mi+1]+'"><span class="em">'+MODES[ord[mi+1]].em+'</span>'+MODES[ord[mi+1]].n+'</button>';
   else if(t.wk&&t.kind==='w'){var si=-1;EN.forEach(function(x,i){if(x.wk===t.wk&&x.kind==='s')si=i;});next=si>=0?'<button class="rbtn" data-act="enlearn" data-g="'+si+'"><span class="em">💬</span>Cümleler</button>':'<button class="rbtn" data-act="en"><span class="em">🔤</span>Konular</button>';}
   else next='<button class="rbtn" data-act="en"><span class="em">🔤</span>Konular</button>';
@@ -1887,11 +1889,13 @@ function initDict(tries){
     if(SAY&&screen==='ensay')sayCtl();
   },function(){DICT_READY=true;if(SAY&&screen==='ensay')sayCtl();});
 }
-MODES.s={n:'Tekrar Et',em:'🦜',bonus:1,d:'Duyduğunu söyle',vis:'👂 ➜ 🗣️',rw:'⭐ 2–4'};
-MODES.r={n:'Sen Bil',em:'🗣️',bonus:2,d:'Resme bak, adını söyle',vis:'🖼️ ➜ 🗣️',rw:'⭐ 3–5'};
+MODES.s={n:'Tekrar Et',em:'🦜',bonus:1,d:'🐣 Kolay · önce dinler, sonra söyler',vis:'👂 ➜ 🗣️',rw:'⭐ 2–4'};
+MODES.m={n:'Kendin Söyle',em:'🙋',bonus:2,d:'🐥 Orta · uygulama susar, Karel söyler',vis:'🖼️ ➜ 🗣️',rw:'⭐ 3–5'};
+MODES.r={n:'Sen Bil',em:'🗣️',bonus:2,d:'🦅 Zor · "What is this?" sorusuna cevap',vis:'❓ ➜ 🗣️',rw:'⭐ 3–5'};
 var RQ={family:'Who is this?',feelings:'How do you feel?',w2w:'What are they doing?',w5w:'What are they doing?'};
 function recallQ(t){return t.t==='color'?'What color is this?':t.t==='num'?'What number is this?':RQ[t.k]||'What is this?';}
-function sayModes(t){return t.kind==='s'?['s']:['s','r'];}
+function sayModes(t){return t.kind==='s'?['s','m']:['s','m','r'];}
+function sayEN(){return !SAY||SAY.m!=='m';}   /* Orta: İngilizce "Great!"/"Try again!" yok, sadece Türkçe */
 
 /* söylenen ile hedef ne kadar benziyor (çocuk telaffuzu için hoşgörülü) */
 var NUMW={'0':'zero','1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten'};
@@ -1941,7 +1945,7 @@ function startEnSay(gi,m){
 }
 function sayRender(){
   var t=EN[SAY.gi],w=SAY.items[SAY.i],n=SAY.items.length,sent=t.kind==='s';
-  var showTxt=SAY.m==='s'||SAY.state==='good'||SAY.state==='reveal';
+  var showTxt=true;  /* anne-baba okuyup yönlendirsin: her adımda yazılı */
   app.innerHTML='<div class="bar">'+navBtns()+'<div class="btitle">'+MODES[SAY.m].em+' '+MODES[SAY.m].n+'<small>'+t.n+' · '+(SAY.i+1)+'/'+n+'</small></div>'+walletChip(false)+'</div>'+
     '<div class="sayprog"><i style="width:'+(SAY.i/n*100)+'%"></i></div>'+
     '<button class="saypic'+(sent?' sent':'')+'" data-act="sayhear"><span class="ev">'+enVis(t,w)+'</span>'+
@@ -1993,7 +1997,7 @@ function saySet(st){if(!SAY)return;SAY.state=st;sayCtl();}
 function sayPrompt(){
   if(!SAY)return;var t=EN[SAY.gi],w=SAY.items[SAY.i],tok=++SAY.tok;SAY.started=true;
   saySet('wait');sayBubble('👂');
-  var seq=SAY.m==='r'?[{k:'e:'+recallQ(t)}]:[enSay(w),{k:'e:Your turn!'}];
+  var seq=SAY.m==='r'?[{k:'e:'+recallQ(t)}]:SAY.m==='m'?[]:[enSay(w),{k:'e:Your turn!'}];
   say(seq,function(){if(!SAY||SAY.tok!==tok||screen!=='ensay')return;sayBubble('🎤 ?');saySet('ready');var mb=$('#micbtn');if(mb)mb.classList.add('pulse');});
 }
 /* mikrofon düğmesi: dinlemeyi doğrudan dokunuşla başlatır */
@@ -2059,8 +2063,8 @@ function sayJudge(reason){
     saySet('wait');sayBubble('👂 ❓');
     if(reason==='not_granted'){DICT=null;toast('🎤 Mikrofon kullanılamıyor.<br><small>Karel söylesin, siz dinleyip 👍 ya da 🔁 seçin.</small>');sayCtl();}
     ++SAY.tok;var tk=SAY.tok;
-    sayFb([{k:'e:Your turn!'}],'Duyamadım. Hadi, sen söyle!',function(){
-      say([SAY.m==='r'&&SAY.tries<2?{k:'e:'+recallQ(EN[SAY.gi])}:enSay(w)],function(){if(SAY&&SAY.tok===tk){sayBubble('🎤 ?');saySet('ready');}});
+    sayFb(sayEN()?[{k:'e:Your turn!'}]:[],'Duyamadım. Hadi, sen söyle!',function(){
+      say(SAY.m==='m'?[]:[SAY.m==='r'&&SAY.tries<2?{k:'e:'+recallQ(EN[SAY.gi])}:enSay(w)],function(){if(SAY&&SAY.tok===tk){sayBubble('🎤 ?');saySet('ready');}});
     });
     return;
   }
@@ -2071,8 +2075,9 @@ function sayWrong(){
   SAY.tries++;sfx('boing');
   if(SAY.tries>=2)sayReveal();   /* Sen Bil'de ikinci yanlıştan sonra yazısı da görünsün */
   saySet('wait');sayBubble('🔁 <b class="fbt no">Tekrar</b>');++SAY.tok;var tk=SAY.tok;
-  sayFb([TRYAGAIN],'Olmadı, tekrar söyle.',function(){
-    say([enSay(w)],function(){if(SAY&&SAY.tok===tk){sayBubble('🎤 ?');saySet('ready');}});
+  var hint=SAY.m!=='m'||SAY.tries>=2;   /* Orta'da kelimeyi ancak 2. yanlıştan sonra ipucu olarak okur */
+  sayFb(sayEN()?[TRYAGAIN]:[],'Olmadı, tekrar söyle.',function(){
+    say(hint?[enSay(w)]:[],function(){if(SAY&&SAY.tok===tk){sayBubble('🎤 ?');saySet('ready');}});
   });
 }
 function sayReveal(){var s=document.querySelector('.saytxt');if(s)s.classList.remove('hide');}
@@ -2083,7 +2088,7 @@ function sayGood(){
   var p=$('#parrot');if(p){p.classList.remove('hop');void p.offsetWidth;p.classList.add('hop');}
   var r=(p||app).getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,26);
   sfx('ding');++SAY.tok;var tk=SAY.tok;
-  sayFb([praise()],'Aferin! Doğru söyledin.',function(){if(SAY&&SAY.tok===tk)SAY.nt=setTimeout(sayNext,500);});
+  sayFb(sayEN()?[praise()]:[],'Aferin! Doğru söyledin.',function(){if(SAY&&SAY.tok===tk)SAY.nt=setTimeout(sayNext,500);});
 }
 function sayDone(){if(!SAY||SAY.state!=='ready')return;sayGood();}
 function saySkip(){if(!SAY||SAY.state==='good')return;hush();trStop();clearTimeout(SAY.timer);clearTimeout(SAY.fj);clearTimeout(SAY.nt);if(DICT&&DICT.active())micKill();SAY.tok++;sayNext();}
