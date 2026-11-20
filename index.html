@@ -1895,7 +1895,8 @@ MODES.r={n:'Sen Bil',em:'🗣️',bonus:2,d:'🦅 Zor · "What is this?" sorusun
 var RQ={family:'Who is this?',feelings:'How do you feel?',w2w:'What are they doing?',w5w:'What are they doing?'};
 function recallQ(t){return t.t==='color'?'What color is this?':t.t==='num'?'What number is this?':RQ[t.k]||'What is this?';}
 function sayModes(t){return t.kind==='s'?['s','m']:['s','m','r'];}
-function sayEN(){return !SAY||SAY.m!=='m';}   /* Orta: İngilizce "Great!"/"Try again!" yok, sadece Türkçe */
+function sayEN(){return true;}
+function sayTRon(){return !SAY||SAY.m!=='m';}   /* Orta: Türkçe yok, sadece İngilizce "Great!" / "Try again!" */
 
 /* söylenen ile hedef ne kadar benziyor (çocuk telaffuzu için hoşgörülü) */
 var NUMW={'0':'zero','1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten'};
@@ -1924,7 +1925,7 @@ function sayTR(text,cb){
   }catch(e){fin();}
 }
 /* önce İngilizce, sonra Türkçe */
-function sayFb(seq,tr,cb){var me=SAY,tk=SAY&&SAY.tok;say(seq,function(){if(SAY!==me||SAY.tok!==tk)return;sayTR(tr,function(){if(SAY===me&&SAY.tok===tk&&cb)cb();});});}
+function sayFb(seq,tr,cb){var me=SAY,tk=SAY&&SAY.tok,useTR=sayTRon();say(seq,function(){if(SAY!==me||SAY.tok!==tk)return;var go=function(){if(SAY===me&&SAY.tok===tk&&cb)cb();};if(useTR)sayTR(tr,go);else go();});}
 var SAY=null;
 function sayEnd(){
   trStop();if(!SAY)return;clearTimeout(SAY.timer);clearTimeout(SAY.nt);clearTimeout(SAY.fj);
