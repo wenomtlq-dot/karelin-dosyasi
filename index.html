@@ -602,7 +602,7 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .plant.st0 .soil,.plant.st1 .soil{width:1.4em;height:.45em}
 .plant .gf{position:relative}
 .plant .seedm{display:block;width:.5em;height:.35em;border-radius:50% 50% 40% 40%;background:#8b5a2b;margin:0 auto .05em;box-shadow:inset 0 -2px 0 rgba(0,0,0,.2)}
-.plant.st3 .ge{animation:ripeb 1.6s ease-in-out infinite;transform-origin:50% 100%}
+.plant.st2 .ge{animation:ripeb 1.6s ease-in-out infinite;transform-origin:50% 100%}
 @keyframes ripeb{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .plant .ripe{position:absolute;right:-.35em;top:-.3em;font-size:.45em;animation:twk 1.2s ease-in-out infinite}
 .plant .ripe .gimg{width:1em;height:1em}
@@ -620,14 +620,14 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .dpad button{border:0;border-radius:16px;background:rgba(255,255,255,.82);box-shadow:0 3px 8px rgba(0,0,0,.18);font-size:22px;color:#2f6f3a;font-family:inherit;touch-action:none;user-select:none;-webkit-user-select:none}
 .dpad button.on{background:#ffd84d;transform:scale(.94)}
 .dpad [data-dir=u]{grid-column:2;grid-row:1}.dpad [data-dir=l]{grid-column:1;grid-row:2}.dpad [data-dir=r]{grid-column:3;grid-row:2}.dpad [data-dir=d]{grid-column:2;grid-row:3}
-.gact{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);z-index:3000;width:96px;height:96px;border-radius:50%;border:4px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25);font-family:inherit;color:#fff;transition:transform .2s}
+.gact{position:absolute;left:calc(50% - 48px);bottom:16px;transform:none;z-index:3000;width:96px;height:96px;border-radius:50%;border:4px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,.25);font-family:inherit;color:#fff;transition:transform .2s}
 .gact .gimg{width:52px;height:52px}
-.gact small{font-size:15px;font-weight:800;line-height:1;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.gact small{white-space:nowrap;font-size:15px;font-weight:800;line-height:1;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,.3)}
 .gact.plant{background:linear-gradient(135deg,#8bd36b,#3f9d2e)}
 .gact.water{background:linear-gradient(135deg,#6ec3ff,#2b7bd6);animation:pulse 1.4s ease-in-out infinite}
 .gact.harvest{background:linear-gradient(135deg,#ffc94d,#e88a00);animation:pulse 1.2s ease-in-out infinite}
-.gact.hide{transform:translateX(-50%) scale(0)}
-.seedbar{position:absolute;left:50%;bottom:122px;transform:translateX(-50%) translateY(20px);z-index:3001;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;background:rgba(255,255,255,.95);padding:8px;border-radius:22px;box-shadow:0 10px 26px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;width:min(92%,380px)}
+.gact.hide{transform:scale(0);animation:none}
+.seedbar{position:absolute;left:50%;bottom:122px;transform:translateX(-50%) translateY(20px);z-index:3001;display:block;background:rgba(255,255,255,.95);padding:8px;border-radius:22px;box-shadow:0 10px 26px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;width:min(92%,380px)}
 .seedbar.open{opacity:1;pointer-events:auto;transform:translateX(-50%)}
 .seedbar button{border:0;background:#f4fbef;border-radius:14px;padding:4px 2px 3px;display:flex;flex-direction:column;align-items:center;font-family:inherit}
 .seedbar .gimg{width:40px;height:40px}
@@ -635,6 +635,31 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 10px}
 .bcell{background:#fffaf0;border-radius:16px;padding:6px;display:flex;flex-direction:column;align-items:center}
 .bcell .gimg{width:48px;height:48px}.bcell b{font-size:20px}.bcell small{font-size:12px;font-weight:700;color:var(--muted)}
+.garden .gworld{position:absolute;left:0;top:0;width:300%;height:100%;will-change:transform}
+.garden.mini .gworld{transform:translateX(-33.333%)}
+.garden .gworld .fence{left:0;right:0}
+.gdeco{position:absolute;transform:translate(-50%,-100%);font-size:calc(var(--gw,360px)*.16);z-index:150;pointer-events:none;opacity:.95}
+.gdeco .gimg{width:1em;height:1em;filter:drop-shadow(0 4px 3px rgba(0,0,0,.18))}
+.gedge{position:absolute;top:44%;z-index:2900;width:46px;height:64px;border:0;background:rgba(255,255,255,.78);color:#2f6f3a;font-size:24px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.18);font-family:inherit;opacity:0;pointer-events:none;transition:opacity .3s}
+.gedge.l{left:0;border-radius:0 22px 22px 0}.gedge.r{right:0;border-radius:22px 0 0 22px}
+.gedge.show{opacity:1;pointer-events:auto;animation:edgeb 1.6s ease-in-out infinite}
+.gedge.l.show{animation-name:edgel}
+@keyframes edgeb{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes edgel{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+.plant .pbar{position:absolute;left:50%;bottom:-.32em;transform:translateX(-50%);width:.9em;min-width:34px;height:7px;border-radius:99px;background:rgba(255,255,255,.75);box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden}
+.plant .pbar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#8bd36b,#3f9d2e);transition:width 1s linear}
+.plant.wet .pbar i{background:linear-gradient(90deg,#6ec3ff,#2b7bd6)}
+.plant .wbadge{position:absolute;right:-.3em;top:-.15em;font-size:.4em;animation:twk 1.8s ease-in-out infinite}
+.plant .wbadge .gimg{width:1em;height:1em}
+.plant.wet .soil{background:radial-gradient(ellipse at 50% 35%,#7a4a24,#3f230e 70%)}
+.ftxt{position:absolute;z-index:2600;transform:translate(-50%,0);font-size:26px;font-weight:900;pointer-events:none;text-shadow:0 2px 0 #fff,0 0 8px #fff;animation:ftup 1.3s ease-out forwards;white-space:nowrap}
+@keyframes ftup{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}100%{opacity:0;transform:translate(-50%,-50px) scale(1)}}
+.gact.wait{background:linear-gradient(135deg,#9bb7c9,#5d7f96)}
+.gact .wt{font-size:34px;line-height:1;animation:twk 2s ease-in-out infinite}
+.seedbar .sbh{text-align:center;font-size:13px;font-weight:700;color:#4b6b3b;margin:0 0 6px}
+.seedbar .sbg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.seedbar button{position:relative}
+.seedbar button i{position:absolute;right:1px;top:1px;font-style:normal;font-size:10px;font-weight:800;background:#fff4c2;color:#8a5a00;border-radius:99px;padding:0 4px;line-height:15px}
 .bigimg{width:70px !important;height:70px !important;margin:0 auto}
 .bnote{font-size:14px;color:var(--muted)}
 </style>
@@ -721,7 +746,7 @@ SHOP.forEach(function(t){t.items.forEach(function(a){ITEM[a[0]]={k:a[0],e:a[1],n
 var CROPS={cilek:{n:'Çilek',im:'c_cilek',e:'🍓'},havuc:{n:'Havuç',im:'c_havuc',e:'🥕'},domates:{n:'Domates',im:'c_domates',e:'🍅'},karpuz:{n:'Karpuz',im:'c_karpuz',e:'🍉'},
   misir:{n:'Mısır',im:'c_misir',e:'🌽'},uzum:{n:'Üzüm',im:'c_uzum',e:'🍇'},patlican:{n:'Patlıcan',im:'c_patlican',e:'🍆'},lale:{n:'Lale',im:'lale',e:'🌷'},aycicegi:{n:'Ayçiçeği',im:'aycicegi',e:'🌻'}};
 var CORDER=['cilek','havuc','domates','karpuz','misir','uzum','patlican','lale','aycicegi'];
-var GROW=45000,FARM_MAX=8,HARV_STAR=5;   /* her aşama 45 sn (sulayınca hemen); en çok 8 bitki; her 5 üründe 1 yıldız */
+var WORLD=3,DRY_MS=5*60000,WET_MS=2*60000,FARM_MAX=8;   /* bahçe ekranın 3 katı; sulanmazsa 5 dk, sulanırsa 2 dk'da bir büyür; en çok 8 bitki */
 
 /* ================= Oyun seviyeleri ================= */
 var MODES={
@@ -745,7 +770,7 @@ var LBYC={};LETTERS.forEach(function(l){LBYC[l.c]=l;});
    (başka telefondan açınca da aynı bahçe gelir). */
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 var LSKEY='harfcocuk-durum';
-function freshState(){return {v:1,wallet:0,total:0,best:{},garden:[],seq:0,upd:0,farm:[],basket:{},harv:0,me:null};}
+function freshState(){return {v:1,wv:2,wallet:0,total:0,best:{},garden:[],seq:0,upd:0,farm:[],basket:{},harv:0,me:null};}
 function normState(d){
   var s=freshState();if(!d||typeof d!=='object')return s;
   s.wallet=Math.max(0,Math.floor(+d.wallet||0));s.total=Math.max(0,Math.floor(+d.total||0));
@@ -753,12 +778,16 @@ function normState(d){
   if(d.best&&typeof d.best==='object'){for(var k in d.best){var v=Math.floor(+d.best[k]||0);if(v>0&&/^(\d+|e-[a-z0-9]+|h-[eiua]):[kozbxsrm]$/.test(k))s.best[k]=Math.min(3,v);}}
   if(Array.isArray(d.garden)){
     s.garden=d.garden.filter(function(g){return g&&ITEM[g.t];}).slice(0,60).map(function(g){
-      return {id:String(g.id||('g'+(++s.seq))),t:g.t,x:clamp(+g.x||50,3,97),y:clamp(+g.y||70,4,98)};
+      return {id:String(g.id||('g'+(++s.seq))),t:g.t,x:clamp(+g.x||50,1,99),y:clamp(+g.y||70,4,98)};
     });
   }
-  if(d.me&&typeof d.me==='object')s.me={x:clamp(+d.me.x||50,3,97),y:clamp(+d.me.y||84,30,98)};
+  /* eski kayıt (tek ekranlık bahçe): her şey geniş bahçenin ortasına taşınır */
+  var old=d.wv!==2,mx=function(x){return old?(x+100)/WORLD:x;};
+  if(old)s.garden.forEach(function(g){g.x=+mx(g.x).toFixed(2);});
+  if(d.me&&typeof d.me==='object')s.me={x:clamp(mx(+d.me.x||50),1,99),y:clamp(+d.me.y||84,30,98)};
   if(Array.isArray(d.farm))s.farm=d.farm.filter(function(p){return p&&CROPS[p.c];}).slice(0,10).map(function(p){
-    return {id:String(p.id||('p'+(++s.seq))),c:p.c,x:clamp(+p.x||50,3,97),y:clamp(+p.y||80,30,98),t0:+p.t0||Date.now(),w:Math.min(3,Math.max(0,Math.floor(+p.w||0)))};});
+    var st=p.st!=null?Math.min(2,Math.max(0,Math.floor(+p.st||0))):0;
+    return {id:String(p.id||('p'+(++s.seq))),c:p.c,x:clamp(mx(+p.x||50),1,99),y:clamp(+p.y||80,30,98),st:st,since:+p.since||Date.now(),wat:!!p.wat};});
   if(d.basket&&typeof d.basket==='object'){for(var bc in d.basket){if(CROPS[bc]){var bn=Math.max(0,Math.floor(+d.basket[bc]||0));if(bn)s.basket[bc]=bn;}}}
   s.harv=Math.max(0,Math.floor(+d.harv||0));
   return s;
@@ -1482,14 +1511,17 @@ function openSes(){
 
 /* ---- bahçe görünümü ---- */
 function gardenInner(newId){
-  var h='<div class="gsun"></div>'+
-    '<div class="cloud" style="--w:70px;--t:52s;--dl:-12s;top:7%"></div>'+
-    '<div class="cloud" style="--w:52px;--t:41s;--dl:-30s;top:15%"></div>'+
-    '<div class="fence"></div>';
+  var h='<div class="gsun"></div><div class="gworld">'+
+    '<div class="cloud" style="--w:70px;--t:150s;--dl:-12s;top:7%"></div>'+
+    '<div class="cloud" style="--w:52px;--t:120s;--dl:-60s;top:15%"></div>'+
+    '<div class="cloud" style="--w:62px;--t:140s;--dl:-100s;top:10%"></div>'+
+    '<div class="cloud" style="--w:46px;--t:110s;--dl:-30s;top:18%"></div>'+
+    '<div class="fence"></div>'+
+    [[3,'cam'],[9,'agac'],[22,'cam'],[78,'agac'],[90,'cam'],[97,'agac']].map(function(d){return '<span class="gdeco" style="left:'+d[0]+'%;top:'+(SKY_TOP+2)+'%">'+gpic(d[1],'')+'</span>';}).join('');
   if(!ST.garden.length&&!(ST.farm||[]).length)h+='<div class="gempty">🌱<small>Yıldızlarla bahçeni süsle!</small></div>';
   ST.garden.forEach(function(g){h+=itemHTML(g,g.id===newId);});
   if(!$('#garden'))krLoad();
-  h+=plantsHTML()+karelHTML();
+  h+=plantsHTML()+karelHTML()+'</div>';
   return h;
 }
 function itemHTML(g,isNew){
@@ -1501,7 +1533,8 @@ function itemHTML(g,isNew){
 }
 function sizeGardens(){
   var gs=document.querySelectorAll('.garden');for(var i=0;i<gs.length;i++)gs[i].style.setProperty('--gw',gs[i].clientWidth+'px');
-  var gd=$('#garden');if(gd){AN.W=gd.clientWidth;AN.H=gd.clientHeight;}
+  var gd=$('#garden');if(gd){var gwd=gd.querySelector('.gworld');AN.W=(gwd||gd).clientWidth;AN.H=gd.clientHeight;}
+  miniCam();
 }
 function shelvesHTML(){
   var cnt={};ST.garden.forEach(function(g){cnt[g.t]=(cnt[g.t]||0)+1;});
@@ -1523,9 +1556,9 @@ function renderShop(openSheet){
     '<button class="shopfab'+(canBuyAny()?' pulse':'')+'" id="shopfab" data-act="sheetopen"><span class="em">🏪</span>Dükkan</button>'+
     '<div class="sheet-bg" id="sheetbg" data-act="sheetclose"></div>'+
     '<div class="sheet" id="sheet"><div class="sheet-h"><span class="grab"></span><div class="btitle">🏪 Dükkan</div>'+walletChip(false)+
-    '<button class="sheetx" data-act="sheetclose" aria-label="Kapat">✕</button></div><div class="sheet-body"><div class="parentnote" style="text-align:center;margin:2px 0 4px">Bahçedeki hayvanlara dokununca ses çıkarırlar. Parmağınla istediğin yere taşıyabilirsin. Karel\'i yön tuşlarıyla yürüt; tarlaya tohum ek, sula, büyüyünce topla. Her 5 üründe 1 ⭐.</div><div id="shelves">'+shelvesHTML()+'</div></div></div>';
+    '<button class="sheetx" data-act="sheetclose" aria-label="Kapat">✕</button></div><div class="sheet-body"><div class="parentnote" style="text-align:center;margin:2px 0 4px">Bahçedeki hayvanlara dokununca ses çıkarırlar. Parmağınla istediğin yere taşıyabilirsin. Karel\'i yön tuşlarıyla yürüt; bahçe yanlara doğru genişler. Tarlaya tohum ek (1 ⭐), sula, büyüyünce topla (2 ⭐).</div><div id="shelves">'+shelvesHTML()+'</div></div></div>';
   sizeGardens();window.scrollTo(0,0);animBuild();animStart();ambStart();KR.el=null;KR.mode='';
-  try{if(!localStorage.getItem('harf-bahce2')){localStorage.setItem('harf-bahce2','1');setTimeout(function(){if(screen==='shop')toast('🚶 Yön tuşlarıyla ya da yere dokunarak '+KID+'\'i yürüt.<br>🌱 Tohum ek · 💧 sula · 🧺 topla!');},900);}}catch(e){}
+  try{if(!localStorage.getItem('harf-bahce3')){localStorage.setItem('harf-bahce3','1');setTimeout(function(){if(screen==='shop')toast('🚶 Yön tuşlarıyla ya da yere dokunarak '+KID+'\'i yürüt; bahçe yanlara doğru genişliyor.<br>🌱 Tohum 1 ⭐ · 💧 sula · 🧺 topla 2 ⭐');},900);}}catch(e){}
   if(openSheet&&canBuyAny())setTimeout(function(){if(screen==='shop')sheet(true);},350);
 }
 function sheet(open){
@@ -1533,14 +1566,15 @@ function sheet(open){
   s.classList.toggle('open',open);bg.classList.toggle('open',open);
   if(open){var sb=$('#shelves');if(sb)sb.innerHTML=shelvesHTML();}
 }
+function visX(f){var w=gworld(),gd=$('#garden');if(!w||!gd)return (100+f)/WORLD;return ((KR.cam||0)+f/100*gd.clientWidth)/w.clientWidth*100;}
 function freeSpot(it){
   var best=null,bestD=-1;
   for(var i=0;i<24;i++){
     var x,y;
-    if(it.k==='gol'){x=20+Math.random()*60;y=45+Math.random()*40;}
-    else if(it.sky){x=10+Math.random()*80;y=8+Math.random()*(SKY_TOP-12);}
-    else{x=8+Math.random()*84;y=SKY_TOP+8+Math.random()*(96-SKY_TOP-8);}
-    var d=99;ST.garden.forEach(function(g){var dx=g.x-x,dy=(g.y-y)*1.3;d=Math.min(d,Math.sqrt(dx*dx+dy*dy));});
+    if(it.k==='gol'){x=visX(20+Math.random()*60);y=45+Math.random()*40;}
+    else if(it.sky){x=visX(10+Math.random()*80);y=8+Math.random()*(SKY_TOP-12);}
+    else{x=visX(8+Math.random()*84);y=SKY_TOP+8+Math.random()*(96-SKY_TOP-8);}
+    var d=99;ST.garden.forEach(function(g){var dx=(g.x-x)*WORLD,dy=(g.y-y)*1.3;d=Math.min(d,Math.sqrt(dx*dx+dy*dy));});
     if(d>bestD){bestD=d;best={x:x,y:y};}
     if(d>16)break;
   }
@@ -1561,7 +1595,7 @@ function buy(k,card){
   var gd=$('#garden');
   if(gd){
     var e=gd.querySelector('.gempty');if(e)e.remove();
-    gd.insertAdjacentHTML('beforeend',itemHTML(g,true));
+    (gd.querySelector('.gworld')||gd).insertAdjacentHTML('beforeend',itemHTML(g,true));
     animAdd(g);
   }
   var fab=$('#shopfab');if(fab)fab.classList.toggle('pulse',canBuyAny());
@@ -1584,7 +1618,7 @@ function animEntry(g,el){
   return {g:g,el:el,ge:el.querySelector('.ge'),gf:el.querySelector('.gf'),b:b,x:g.x,y:g.y,tx:g.x,ty:g.y,state:'idle',until:performance.now()+800+Math.random()*2500,face:1,ph:Math.random()*6,drag:false};
 }
 function animBuild(){
-  AN.list=[];var gd=$('#garden');if(!gd)return;AN.W=gd.clientWidth;AN.H=gd.clientHeight;
+  AN.list=[];var gd=$('#garden');if(!gd)return;var gwd=gd.querySelector('.gworld');AN.W=(gwd||gd).clientWidth;AN.H=gd.clientHeight;
   ST.garden.forEach(function(g){var a=animEntry(g,gd.querySelector('.gi[data-id="'+g.id+'"]'));if(a)AN.list.push(a);});
 }
 function animAdd(g){var gd=$('#garden');if(!gd)return;var a=animEntry(g,gd.querySelector('.gi[data-id="'+g.id+'"]'));if(a){a.until=performance.now()+1500;AN.list.push(a);}}
@@ -1594,7 +1628,7 @@ function pickTarget(a){
   var m=a.b.m;
   if(m==='fly'){a.tx=6+Math.random()*88;a.ty=6+Math.random()*(SKY_TOP-8);}
   else if(m==='flutter'){a.tx=8+Math.random()*84;a.ty=10+Math.random()*55;}
-  else{var r=30;a.tx=clamp(a.x+(Math.random()*2-1)*r,6,94);a.ty=clamp(a.y+(Math.random()*2-1)*r*.8,SKY_TOP+6,97);}
+  else{var r=30;a.tx=clamp(a.x+(Math.random()*2-1)*r/WORLD,2,98);a.ty=clamp(a.y+(Math.random()*2-1)*r*.8,SKY_TOP+6,97);}
 }
 function animTick(t){
   if(!AN.on)return;
@@ -1608,7 +1642,7 @@ function animTick(t){
       else if(a.b.m==='flutter'){a.el.style.top=(a.y+Math.sin(t/220+a.ph)*0.8)+'%';}
       continue;
     }
-    var dx=a.tx-a.x,dy=(a.ty-a.y)/ratio,d=Math.sqrt(dx*dx+dy*dy),step=a.b.v*dt;
+    var dx=a.tx-a.x,dy=(a.ty-a.y)/ratio,d=Math.sqrt(dx*dx+dy*dy),step=a.b.v*dt/WORLD;
     if(d<=step){
       a.x=a.tx;a.y=a.ty;a.state='idle';a.until=t+(a.b.m==='walk'?1500+Math.random()*4000:600+Math.random()*1800);
       a.ge.classList.remove('walking');if(a.b.m==='walk')a.ge.classList.remove('flying');
@@ -1625,7 +1659,7 @@ function animTick(t){
 var drag=null;
 document.addEventListener('pointerdown',function(e){
   var el=e.target.closest('.garden.full .gi');if(!el)return;
-  var gd=el.closest('.garden'),r=gd.getBoundingClientRect(),id=el.getAttribute('data-id');
+  var gd=el.closest('.gworld')||el.closest('.garden'),r=gd.getBoundingClientRect(),id=el.getAttribute('data-id');
   var g=ST.garden.filter(function(x){return x.id===id;})[0];if(!g)return;
   var a=null;for(var i=0;i<AN.list.length;i++)if(AN.list[i].g===g)a=AN.list[i];
   var cx=a?a.x:g.x,cy=a?a.y:g.y;
@@ -1638,7 +1672,7 @@ document.addEventListener('pointermove',function(e){
   if(!drag||e.pointerId!==drag.pid)return;
   if(!drag.moved&&Math.abs(e.clientX-drag.sx)+Math.abs(e.clientY-drag.sy)<8)return;
   if(!drag.moved){drag.moved=true;drag.el.classList.add('drag');}
-  var x=clamp((e.clientX-drag.ox-drag.r.left)/drag.r.width*100,3,97),y=clamp((e.clientY-drag.oy-drag.r.top)/drag.r.height*100,6,98);
+  var x=clamp((e.clientX-drag.ox-drag.r.left)/drag.r.width*100,1,99),y=clamp((e.clientY-drag.oy-drag.r.top)/drag.r.height*100,6,98);
   drag.g.x=+x.toFixed(1);drag.g.y=+y.toFixed(1);
   if(drag.a){drag.a.x=drag.g.x;drag.a.y=drag.g.y;}
   drag.el.style.left=drag.g.x+'%';drag.el.style.top=drag.g.y+'%';
@@ -1661,8 +1695,9 @@ document.addEventListener('pointerup',function(e){endDrag(e,false);});
 document.addEventListener('pointercancel',function(e){endDrag(e,true);});
 
 
-/* ================= BAHÇE 2: 3D resimler, yürüyen Karel, tarla (ek · sula · topla) ================= */
-/* Resimler bahce.js içinde (GIMG). Tek tek "blob" adrese çevrilir; sayfada kısa adres kullanılır. */
+/* ================= BAHÇE 2: geniş bahçe, yürüyen Karel, tarla (ek · sula · topla) ================= */
+/* Bahçe ekrandan 3 kat geniş (WORLD). Konumlar bütün bahçenin yüzdesi (0–100); Karel yürüdükçe görüntü onu izler.
+   Resimler bahce.js içinde (GIMG); her biri bir kez "blob" adrese çevrilir. */
 var GURL={};
 (function(){
   var src=window.GIMG||{};
@@ -1670,119 +1705,153 @@ var GURL={};
 })();
 function gpic(k,emo,cls){return GURL[k]?'<img class="gimg'+(cls?' '+cls:'')+'" src="'+GURL[k]+'" alt="" draggable="false">':(emo||'');}
 function itemFace(k){var it=ITEM[k];return it?gpic(k,it.e):'';}
+function V(x){return x/WORLD;}   /* ekran yüzdesini bahçe yüzdesine çevir */
+function gworld(){return document.querySelector('#garden .gworld');}
 
 /* ---- Karel ---- */
-var KR={x:50,y:84,tx:null,ty:null,dir:null,el:null,face:1,moving:false,after:null,lastUI:0,lastGrow:0,mode:''};
-function krLoad(){var m=ST.me||{};KR.x=clamp(+m.x||50,4,96);KR.y=clamp(+m.y||84,SKY_TOP+8,97);KR.tx=null;KR.dir=null;KR.after=null;KR.el=null;KR.mode='';}
-function krSave(){ST.me={x:+KR.x.toFixed(1),y:+KR.y.toFixed(1)};saveState();}
+var KR={x:50,y:84,tx:null,ty:null,dir:null,el:null,face:1,moving:false,after:null,lastUI:0,lastGrow:0,mode:'',cam:null};
+function krLoad(){var m=ST.me||{};KR.x=clamp(+m.x||50,4,96);KR.y=clamp(+m.y||84,SKY_TOP+8,97);KR.tx=null;KR.dir=null;KR.after=null;KR.el=null;KR.mode='';KR.cam=null;}
+function krSave(){ST.me={x:+KR.x.toFixed(2),y:+KR.y.toFixed(1)};saveState();}
 function karelHTML(){
   return '<div class="gi karel" id="karel" style="left:'+KR.x+'%;top:'+KR.y+'%;z-index:'+(200+Math.round(KR.y*10))+';font-size:calc(var(--gw,360px)*.15)">'+
     '<span class="kshadow"></span><span class="gf"><span class="ge">'+gpic('karel','🚶')+'</span></span><span class="kname">'+KID+'</span></div>';
 }
 
-/* ---- tarla ---- */
-function pStage(p){return Math.min(3,(p.w||0)+Math.floor((Date.now()-p.t0)/GROW));}
+/* ---- tarla: 1 ⭐ ile ekilir; sulanırsa 2 dk, sulanmazsa 5 dk'da bir büyür; 2 büyümeden sonra toplanır, 2 ⭐ verir ---- */
+function pCalc(p){
+  var st=p.st||0,since=p.since||Date.now(),wat=!!p.wat,now=Date.now();
+  while(st<2){var need=wat?WET_MS:DRY_MS;if(now-since>=need){since+=need;st++;wat=false;}else break;}
+  return {st:st,since:since,wat:wat,left:st<2?Math.max(0,(wat?WET_MS:DRY_MS)-(now-since)):0,need:wat?WET_MS:DRY_MS};
+}
+function pSync(p){var c=pCalc(p);p.st=c.st;p.since=c.since;p.wat=c.wat;return c;}
+function pStage(p){return pCalc(p).st;}
+function mmss(ms){var s=Math.ceil(ms/1000),m=Math.floor(s/60);s=s%60;return m+':'+(s<10?'0':'')+s;}
 function plantHTML(p,isNew){
-  var st=pStage(p),c=CROPS[p.c];
-  var face=st===0?'<span class="seedm"></span>':st===1?gpic('filiz','🌱'):st===2?gpic('fidan','🌿'):gpic(c.im,c.e);
-  return '<div class="gi plant st'+st+'" data-pid="'+p.id+'" data-st="'+st+'" style="left:'+p.x+'%;top:'+p.y+'%;z-index:'+(200+Math.round(p.y*10))+';font-size:calc(var(--gw,360px)*'+(st===3?.11:st===2?.085:.065)+')">'+
-    '<span class="soil"></span><span class="gf"><span class="ge'+(isNew?' new':'')+'">'+face+'</span></span>'+(st===3?'<span class="ripe">'+gpic('pirilti','✨')+'</span>':'')+'</div>';
+  var c=pCalc(p),cr=CROPS[p.c],st=c.st;
+  var face=st===0?gpic('filiz','🌱'):st===1?gpic('fidan','🌿'):gpic(cr.im,cr.e);
+  var pct=st<2?Math.round(100*(1-c.left/c.need)):100;
+  return '<div class="gi plant st'+st+(c.wat?' wet':'')+'" data-pid="'+p.id+'" data-st="'+st+'" style="left:'+p.x+'%;top:'+p.y+'%;z-index:'+(200+Math.round(p.y*10))+';font-size:calc(var(--gw,360px)*'+(st===2?.11:st===1?.085:.065)+')">'+
+    '<span class="soil"></span><span class="gf"><span class="ge'+(isNew?' new':'')+'">'+face+'</span></span>'+
+    (st===2?'<span class="ripe">'+gpic('pirilti','✨')+'</span>':'<span class="pbar"><i style="width:'+pct+'%"></i></span>'+(c.wat?'<span class="wbadge">'+gpic('damla','💧')+'</span>':''))+'</div>';
 }
 function plantsHTML(){return (ST.farm||[]).map(function(p){return plantHTML(p);}).join('');}
 function plantEl(p){return document.querySelector('#garden .plant[data-pid="'+p.id+'"]');}
 function plantRefresh(p,isNew){var el=plantEl(p);if(el)el.outerHTML=plantHTML(p,isNew);}
-function farmGrowTick(){(ST.farm||[]).forEach(function(p){var el=plantEl(p);if(el&&+el.getAttribute('data-st')!==pStage(p)){plantRefresh(p,true);if(pStage(p)===3)sfx('ding');}});}
+function farmGrowTick(){
+  (ST.farm||[]).forEach(function(p){
+    var el=plantEl(p);if(!el)return;var c=pCalc(p);
+    if(+el.getAttribute('data-st')!==c.st||el.classList.contains('wet')!==c.wat){pSync(p);plantRefresh(p,true);if(c.st===2){sfx('ding');}saveState();return;}
+    var i=el.querySelector('.pbar i');if(i)i.style.width=Math.round(100*(1-c.left/c.need))+'%';
+  });
+}
 function nearPlant(){
   var best=null,bd=99,ratio=AN.H?AN.W/AN.H:1;
   (ST.farm||[]).forEach(function(p){var dx=p.x-KR.x,dy=(p.y-KR.y)/ratio,d=Math.sqrt(dx*dx+dy*dy);if(d<bd){bd=d;best=p;}});
-  return bd<9?best:null;
+  return bd<V(9)?best:null;
 }
-function spotFree(x,y){var ok=true;(ST.farm||[]).forEach(function(p){if(Math.abs(p.x-x)<7&&Math.abs(p.y-y)<6)ok=false;});return ok;}
+function spotFree(x,y){var ok=true;(ST.farm||[]).forEach(function(p){if(Math.abs(p.x-x)<V(7)&&Math.abs(p.y-y)<6)ok=false;});return ok;}
 
 /* ---- kontroller ---- */
 function farmCtrlHTML(){
   return '<button class="gbasket" id="gbasket" data-act="basket">'+gpic('sepet','🧺')+'<b id="bcount">'+basketTotal()+'</b></button>'+
+    '<button class="gedge l" id="gedgel" data-act="gedge" data-d="-1">◀</button><button class="gedge r" id="gedger" data-act="gedge" data-d="1">▶</button>'+
     '<div class="dpad" id="dpad"><button data-dir="u" aria-label="Yukarı">▲</button><button data-dir="l" aria-label="Sola">◀</button><button data-dir="r" aria-label="Sağa">▶</button><button data-dir="d" aria-label="Aşağı">▼</button></div>'+
     '<button class="gact" id="gact" data-act="gact"></button>'+
-    '<div class="seedbar" id="seedbar">'+CORDER.map(function(c){return '<button data-act="seed" data-c="'+c+'">'+gpic(CROPS[c].im,CROPS[c].e)+'<small>'+CROPS[c].n+'</small></button>';}).join('')+'</div>';
+    '<div class="seedbar" id="seedbar"><div class="sbh">Tohum seç · her biri <b>1 ⭐</b> · toplayınca <b>2 ⭐</b></div><div class="sbg">'+
+      CORDER.map(function(c){return '<button data-act="seed" data-c="'+c+'">'+gpic(CROPS[c].im,CROPS[c].e)+'<small>'+CROPS[c].n+'</small><i>⭐1</i></button>';}).join('')+'</div></div>';
 }
 function basketTotal(){var n=0,b=ST.basket||{};for(var c in b)n+=b[c]||0;return n;}
 function krUI(){
   var g=$('#gact');if(!g)return;
-  var p=nearPlant(),mode='';
-  if(p)mode=pStage(p)===3?'harvest':'water';
+  var p=nearPlant(),mode='',c=null;
+  if(p){c=pCalc(p);mode=c.st===2?'harvest':c.wat?'wait':'water';}
   else if(KR.y>SKY_TOP+10)mode='plant';
-  if(mode===KR.mode)return;
-  KR.mode=mode;KR.near=p;
+  var key=mode+(mode==='wait'?Math.ceil(c.left/1000):'');
+  if(key===KR.mode)return;
+  KR.mode=key;
   if(!mode){g.className='gact hide';return;}
   g.className='gact '+mode;
-  g.innerHTML=mode==='plant'?gpic('filiz','🌱')+'<small>Ek</small>':mode==='water'?gpic('damla','💧')+'<small>Sula</small>':gpic('sepet','🧺')+'<small>Topla</small>';
+  g.innerHTML=mode==='plant'?gpic('filiz','🌱')+'<small>Ek · 1⭐</small>':mode==='water'?gpic('damla','💧')+'<small>Sula</small>':mode==='wait'?'<span class="wt">⏳</span><small>'+mmss(c.left)+'</small>':gpic('sepet','🧺')+'<small>Topla +2⭐</small>';
   if(mode!=='plant')seedbar(false);
 }
 function seedbar(open){var s=$('#seedbar');if(s)s.classList.toggle('open',!!open);}
 function gAct(){
   var p=nearPlant();
-  if(p){if(pStage(p)===3)harvest(p);else water(p);return;}
+  if(p){plantAct(p);return;}
   var sb=$('#seedbar');seedbar(!(sb&&sb.classList.contains('open')));
+}
+function plantAct(p){
+  var c=pCalc(p);
+  if(c.st===2)harvest(p);
+  else if(!c.wat)water(p);
+  else{toast('💧 Su verildi.<br><small>Büyümesi için <b>'+mmss(c.left)+'</b> bekle.</small>');}
 }
 function plantSeed(c){
   seedbar(false);
   ST.farm=ST.farm||[];
+  if(ST.wallet<1){toast('⭐ Tohum için 1 yıldız lazım.<br><small>Oyun oyna, yıldız kazan!</small>');sfx('boing');return;}
   if(ST.farm.length>=FARM_MAX){toast('🌱 Tarla dolu!<br><small>Önce olgun ürünleri topla.</small>');sfx('boing');return;}
-  var x=+clamp(KR.x+(KR.face<0?5:-5),5,95).toFixed(1),y=+clamp(KR.y+1.5,SKY_TOP+10,97).toFixed(1);
+  var x=+clamp(KR.x+V(KR.face<0?5:-5),3,97).toFixed(2),y=+clamp(KR.y+1.5,SKY_TOP+10,97).toFixed(1);
   if(!spotFree(x,y)){toast('🌱 Burası dolu.<br><small>Biraz yürü, boş yere ek.</small>');sfx('boing');return;}
-  var p={id:'p'+(++ST.seq),c:c,x:x,y:y,t0:Date.now(),w:0};
-  ST.farm.push(p);saveState();
-  var gd=$('#garden');if(gd)gd.insertAdjacentHTML('beforeend',plantHTML(p,true));
-  krBend();sfx('pop');KR.mode='';krUI();
+  var p={id:'p'+(++ST.seq),c:c,x:x,y:y,st:0,since:Date.now(),wat:false};
+  ST.wallet-=1;ST.farm.push(p);saveState();paintWallet(true);
+  var w=gworld();if(w)w.insertAdjacentHTML('beforeend',plantHTML(p,true));
+  krBend();sfx('pop');floatTxt(p,'−1 ⭐','#b45309');KR.mode='';krUI();
 }
 function water(p){
-  if(pStage(p)>=3)return;
-  var now=Date.now();if(p.lastW&&now-p.lastW<900)return;p.lastW=now;
-  p.w=(p.w||0)+1;saveState();krBend();
-  var el=plantEl(p);
-  if(el){
-    var gd=$('#garden'),r=el.getBoundingClientRect(),gr=gd.getBoundingClientRect();
+  var c=pSync(p);if(c.st>=2||p.wat)return;
+  p.wat=true;saveState();krBend();
+  var el=plantEl(p),w=gworld();
+  if(el&&w){
+    var r=el.getBoundingClientRect(),wr=w.getBoundingClientRect();
     for(var i=0;i<3;i++){(function(i){var d=document.createElement('div');d.className='drop';d.innerHTML=gpic('damla','💧');
-      d.style.left=((r.left+r.width/2-gr.left)/gr.width*100+(i-1)*2.2)+'%';d.style.top=((r.top-gr.top)/gr.height*100-4)+'%';d.style.animationDelay=(i*.12)+'s';
-      gd.appendChild(d);setTimeout(function(){d.remove();},1100);})(i);}
+      d.style.left=((r.left+r.width/2-wr.left)/wr.width*100+V((i-1)*2.2))+'%';d.style.top=((r.top-wr.top)/wr.height*100-4)+'%';d.style.animationDelay=(i*.12)+'s';
+      w.appendChild(d);setTimeout(function(){d.remove();},1100);})(i);}
   }
   playTap('cesme');
-  setTimeout(function(){plantRefresh(p,true);if(pStage(p)===3){sfx('ding');var e2=plantEl(p);if(e2){var r2=e2.getBoundingClientRect();confetti(r2.left+r2.width/2,r2.top,18);}}KR.mode='';krUI();},650);
+  setTimeout(function(){pSync(p);plantRefresh(p,true);if(pStage(p)===2)sfx('ding');saveState();KR.mode='';krUI();},650);
 }
 function harvest(p){
   var el=plantEl(p),c=p.c;
   ST.farm=ST.farm.filter(function(x){return x!==p;});
   ST.basket=ST.basket||{};ST.basket[c]=(ST.basket[c]||0)+1;ST.harv=(ST.harv||0)+1;
-  var bonus=ST.harv%HARV_STAR===0;
-  if(bonus){ST.wallet+=1;ST.total+=1;}
-  saveState();krBend();sfx('coin');
+  ST.wallet+=2;ST.total+=2;
+  saveState();krBend();sfx('coin');floatTxt(p,'+2 ⭐','#15803d');
   if(el){
     var r=el.getBoundingClientRect(),b=$('#gbasket'),br=b?b.getBoundingClientRect():{left:20,top:80,width:40,height:40};
     var f=document.createElement('div');f.className='flyc';f.innerHTML=gpic(CROPS[c].im,CROPS[c].e);
     f.style.left=(r.left+r.width/2-28)+'px';f.style.top=(r.top-10)+'px';document.body.appendChild(f);
     requestAnimationFrame(function(){f.style.transform='translate('+(br.left+br.width/2-(r.left+r.width/2))+'px,'+(br.top+br.height/2-(r.top-10))+'px) scale(.4)';f.style.opacity='.6';});
-    setTimeout(function(){f.remove();var bc=$('#bcount');if(bc){bc.textContent=basketTotal();}if(b){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}},700);
+    setTimeout(function(){f.remove();var bc=$('#bcount');if(bc){bc.textContent=basketTotal();}if(b){b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');}paintWallet(true);},700);
     el.remove();
   }
-  if(bonus)setTimeout(function(){toast('🧺 '+HARV_STAR+' ürün daha topladın!<br><b>+1 ⭐</b>');paintWallet(true);sfx('win');},750);
   KR.mode='';krUI();
+}
+function floatTxt(p,txt,col){
+  var w=gworld();if(!w)return;var d=document.createElement('div');d.className='ftxt';d.textContent=txt;d.style.color=col;
+  d.style.left=p.x+'%';d.style.top=(p.y-8)+'%';w.appendChild(d);setTimeout(function(){d.remove();},1300);
 }
 function krBend(){var el=$('#karel');if(!el)return;var ge=el.querySelector('.ge');ge.classList.remove('bend');void ge.offsetWidth;ge.classList.add('bend');}
 function openBasket(){
   var b=ST.basket||{},list=CORDER.filter(function(c){return b[c];});
-  var left=HARV_STAR-((ST.harv||0)%HARV_STAR);
   modal('<div class="res-face" style="animation:none">'+gpic('sepet','🧺','bigimg')+'</div><h2>Sepetim</h2>'+
     (list.length?'<div class="bgrid">'+list.map(function(c){return '<div class="bcell">'+gpic(CROPS[c].im,CROPS[c].e)+'<b>'+b[c]+'</b><small>'+CROPS[c].n+'</small></div>';}).join('')+'</div>'
       :'<p>Sepet boş. Tarlaya tohum ek, sula, büyüyünce topla!</p>')+
-    '<p class="bnote">Her <b>'+HARV_STAR+'</b> üründe <b>+1 ⭐</b>. Bir sonraki yıldıza <b>'+left+'</b> ürün kaldı.</p>'+
+    '<p class="bnote">Her tohum <b>1 ⭐</b>, her ürün <b>2 ⭐</b>.<br>Sulanırsa 2 dakikada, sulanmazsa 5 dakikada bir büyür. İki kere büyüyünce toplanır.</p>'+
     '<button class="okbtn" data-act="close">Tamam</button>');
 }
 
-/* ---- Karel'in yürümesi (hayvanların döngüsüyle birlikte çalışır) ---- */
+/* ---- Karel'in yürümesi ve görüntünün onu izlemesi (hayvanların döngüsüyle birlikte) ---- */
+function camApply(snap){
+  var w=gworld(),gd=$('#garden');if(!w||!gd)return;
+  var vw=gd.clientWidth,ww=w.clientWidth,target=clamp(KR.x/100*ww-vw/2,0,Math.max(0,ww-vw));
+  if(KR.cam==null||snap)KR.cam=target;else KR.cam+=(target-KR.cam)*0.12;
+  w.style.transform='translateX('+(-KR.cam).toFixed(1)+'px)';
+  var l=$('#gedgel'),r=$('#gedger');if(l)l.classList.toggle('show',KR.cam>8);if(r)r.classList.toggle('show',KR.cam<ww-vw-8);
+}
 function krTick(t,dt){
-  var el=KR.el;if(!el||!el.isConnected){el=KR.el=$('#karel');if(!el)return;}
-  var ratio=AN.H?AN.W/AN.H:1,vx=0,vy=0,sp=19*dt;
+  var el=KR.el;if(!el||!el.isConnected){el=KR.el=$('#karel');if(!el)return;camApply(true);}
+  var ratio=AN.H?AN.W/AN.H:1,vx=0,vy=0,sp=V(19)*dt;
   if(KR.dir){vx=KR.dir[0];vy=KR.dir[1];}
   else if(KR.tx!=null){
     var dx=KR.tx-KR.x,dy=(KR.ty-KR.y)/ratio,d=Math.sqrt(dx*dx+dy*dy);
@@ -1795,24 +1864,38 @@ function krTick(t,dt){
     el.style.left=KR.x+'%';el.style.top=KR.y+'%';el.style.zIndex=200+Math.round(KR.y*10);
     if(Math.abs(vx)>0.05){var f=vx>0?-1:1;if(f!==KR.face){KR.face=f;el.querySelector('.gf').style.transform='scaleX('+f+')';}}
   }
+  camApply(false);
   if(moving!==KR.moving){KR.moving=moving;el.querySelector('.ge').classList.toggle('walking',moving);if(!moving)krSave();}
-  if(t-KR.lastUI>180){KR.lastUI=t;krUI();}
+  if(t-KR.lastUI>250){KR.lastUI=t;krUI();}
   if(t-KR.lastGrow>1000){KR.lastGrow=t;farmGrowTick();}
+}
+/* ekranın kenarındaki oka dokununca Karel o yöne yürür */
+function gEdge(d){
+  var w=gworld(),gd=$('#garden');if(!w||!gd)return;
+  seedbar(false);KR.dir=null;KR.after=null;
+  KR.tx=clamp(KR.x+d*V(80),4,96);KR.ty=KR.y;
+}
+/* küçük bahçe (ana ekran): Karel'in olduğu yer görünsün */
+function miniCam(){
+  var gs=document.querySelectorAll('.garden.mini');
+  for(var i=0;i<gs.length;i++){var w=gs[i].querySelector('.gworld');if(!w)continue;
+    var vw=gs[i].clientWidth,ww=w.clientWidth,mx=(ST.me&&ST.me.x)||50,cam=clamp(mx/100*ww-vw/2,0,Math.max(0,ww-vw));
+    w.style.transform='translateX('+(-cam)+'px)';}
 }
 /* bahçede boş yere dokununca Karel oraya yürür; bitkiye dokununca gidip sular ya da toplar */
 document.addEventListener('click',function(e){
   if(screen!=='shop')return;
-  var gd=e.target.closest('#garden');if(!gd||e.target.closest('.dpad,.gact,.seedbar,.gbasket,.karel'))return;
+  var gd=e.target.closest('#garden');if(!gd||e.target.closest('.dpad,.gact,.seedbar,.gbasket,.gedge,.karel'))return;
   var pl=e.target.closest('.plant');
   if(pl){
     var id=pl.getAttribute('data-pid'),p=(ST.farm||[]).filter(function(x){return x.id===id;})[0];if(!p)return;
     seedbar(false);
-    KR.dir=null;KR.tx=clamp(p.x+(KR.x<p.x?-4:4),4,96);KR.ty=clamp(p.y-0.5,SKY_TOP+7,97);
-    KR.after=function(){var q=(ST.farm||[]).filter(function(x){return x.id===id;})[0];if(!q)return;if(pStage(q)===3)harvest(q);else water(q);};
+    KR.dir=null;KR.tx=clamp(p.x+(KR.x<p.x?-V(4):V(4)),4,96);KR.ty=clamp(p.y-0.5,SKY_TOP+7,97);
+    KR.after=function(){var q=(ST.farm||[]).filter(function(x){return x.id===id;})[0];if(q)plantAct(q);};
     return;
   }
   if(e.target.closest('.gi'))return;
-  var r=gd.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;
+  var w=gd.querySelector('.gworld')||gd,r=w.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;
   if(y<SKY_TOP+4)return;
   seedbar(false);KR.dir=null;KR.after=null;KR.tx=clamp(x,4,96);KR.ty=clamp(y,SKY_TOP+7,97);
 });
@@ -2685,6 +2768,7 @@ document.addEventListener('click',function(e){
   else if(act==='gact')gAct();
   else if(act==='seed')plantSeed(b.getAttribute('data-c'));
   else if(act==='basket')openBasket();
+  else if(act==='gedge')gEdge(+b.getAttribute('data-d'));
   else if(act==='hk')goTo({s:'hk'});
   else if(act==='hklearn')goTo({s:'hklearn',h:b.getAttribute('data-h')});
   else if(act==='hkmodes')goTo({s:'hkmodes',h:b.getAttribute('data-h')});
