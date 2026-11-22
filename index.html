@@ -525,6 +525,10 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .judge:disabled{filter:grayscale(.7);opacity:.55}
 .saymode{text-align:center;margin-top:10px}
 .saymode:not(:empty){display:table;margin:12px auto 0;padding:4px 12px;border-radius:99px;background:color-mix(in srgb,var(--h) 12%,#fff);font-size:13px;font-weight:800;color:color-mix(in srgb,var(--h) 70%,#000)}
+.parentok{margin-top:12px;display:flex;align-items:center;gap:8px;border:2px solid #9fd88a;background:#f2fbec;color:#2f6f3a;font-weight:800;font-size:14px;padding:8px 14px;border-radius:99px;font-family:inherit;box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.parentok span{font-size:20px}
+.micbtn.snd{box-shadow:0 0 0 6px rgba(76,200,90,.35),0 10px 24px rgba(0,0,0,.18)}
+.sndon{color:#2f9a3d}
 .skipbtn{margin-top:14px;border:0;background:transparent;color:var(--muted);font-weight:800;font-size:14px;padding:6px 12px;border-radius:99px;font-family:inherit;text-decoration:underline}
 .fbt{font-size:20px;font-weight:800;vertical-align:middle}
 .fbt.ok{color:#16a34a}.fbt.no{color:#d97706}
@@ -2260,6 +2264,7 @@ function makeSR(){
             }
           };
           rec.onerror=function(e){lastErr=e.error;};
+          rec.onsoundstart=rec.onspeechstart=function(){emit('s',{state:'sound'});};  /* mikrofona ses geldi */
           rec.onspeechend=function(){try{rec.stop();}catch(x){}};  /* konuşma bitince hemen bitir */
           rec.onend=function(){
             if(act){act=false;emit('s',{state:'idle',reason:code(lastErr)});}
@@ -2301,9 +2306,15 @@ var NUMW={'0':'zero','1':'one','2':'two','3':'three','4':'four','5':'five','6':'
 function sayNorm(s){return String(s||'').toLowerCase().replace(/[’']/g,'').replace(/[^a-z0-9 ]+/g,' ').split(/\s+/).filter(Boolean).map(function(x){return NUMW[x]||x;});}
 function lev(a,b){var m=a.length,n=b.length,p=[],i,j;for(j=0;j<=n;j++)p[j]=j;for(i=1;i<=m;i++){var c=[i];for(j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c;}return p[n];}
 function sim(a,b){if(!a||!b)return 0;return 1-lev(a,b)/Math.max(a.length,b.length);}
+/* küçük çocukların karıştırdığı sesler aynı sayılır: r/l/w/y, th→d, f/v/b/p, d/t, k/g, s/z/ş/ç, m/n, sesliler */
+function kidKey(w){
+  w=w.replace(/th/g,'d').replace(/ph/g,'f').replace(/[sc]h/g,'s').replace(/ck/g,'k').replace(/h/g,'');
+  var M={a:'a',e:'a',i:'a',o:'a',u:'a',y:'w',r:'w',l:'w',w:'w',f:'b',v:'b',b:'b',p:'b',d:'d',t:'d',g:'g',k:'g',c:'g',q:'g',x:'g',s:'s',z:'s',j:'s',m:'n',n:'n'};
+  var o='';for(var i=0;i<w.length;i++){var c=M[w[i]]||w[i];if(c!==o.slice(-1))o+=c;}return o;
+}
 function sayScore(target,heard){
   var T=sayNorm(target),H=sayNorm(heard);if(!T.length||!H.length)return 0;
-  var ok=0;T.forEach(function(t){var best=0;H.forEach(function(h){best=Math.max(best,sim(t,h));});if(best>=0.6)ok++;});
+  var ok=0;T.forEach(function(t){var best=0;H.forEach(function(h){best=Math.max(best,sim(t,h),t.length>2&&sim(kidKey(t),kidKey(h))>=0.8?0.8:0);});if(best>=0.6)ok++;});
   return Math.max(ok/T.length,sim(T.join(''),H.join('')));
 }
 
@@ -2339,7 +2350,7 @@ function startEnSay(gi,m){
   if(m==='r')pool=pool.filter(function(w){return !hasF(w,'nogame');});
   while(items.length<8)items=items.concat(shuffle(pool));
   items=noRepeat(items.slice(0,Math.min(8,Math.max(pool.length,6))));
-  SAY={gi:gi,m:m,items:items,i:0,first:0,tries:0,heard:'',state:'wait',timer:null,nt:null,tok:0};
+  SAY={gi:gi,m:m,items:items,i:0,first:0,tries:0,miss:0,deaf:0,snd:false,heard:'',state:'wait',timer:null,nt:null,tok:0};SAYTIP=false;
   sayRender();
 }
 function sayRender(){
@@ -2382,7 +2393,8 @@ function sayCtl(){
   if(DICT){
     c.innerHTML='<button class="micbtn '+st+'" id="micbtn" data-act="saymic"><span class="mi">'+(st==='listen'?'👂':st==='start'?'⏳':'🎤')+'</span>'+
       (st==='listen'?'<i class="ring"></i><i class="ring r2"></i>':'')+'</button><div class="miclab">'+
-      (st==='listen'?'Dinliyorum… bitince tekrar bas':st==='start'?'Mikrofon açılıyor…':st==='ready'?'Bas ve söyle':st==='good'?'Aferin!':'')+'</div>';
+      (st==='listen'?(SAY.snd?'<span class="sndon">🔊 Ses geliyor…</span>':'Dinliyorum… Karel söylesin'):st==='start'?'Mikrofon açılıyor…':st==='ready'?'Bas ve söyle':st==='good'?'Aferin!':'')+'</div>';
+    if(SAY.miss>0&&st!=='good')c.innerHTML+='<button class="parentok" data-act="sayok"><span>👍</span>Telefon duymadı ama doğru söyledi</button>';
   }else{  /* bu ekranda mikrofon yok: Karel söyler, anne-baba dinleyip seçer */
     var dis=st==='ready'?'':' disabled';
     c.innerHTML='<div class="judgerow"><button class="judge ok '+st+'" data-act="sayok"'+dis+'><span class="mi">👍</span>Doğru söyledi</button>'+
@@ -2390,6 +2402,7 @@ function sayCtl(){
       '<div class="miclab">'+(st==='ready'?'Karel söylesin, siz dinleyip seçin':'')+'</div>';
   }
   if(st!=='good')c.innerHTML+='<button class="skipbtn" data-act="sayskip">⏭ Bunu geç</button>';
+  if(DICT&&st==='listen'){var mb=$('#micbtn');if(mb)mb.classList.toggle('snd',!!SAY.snd);}
   var ch=$('#saymode');if(ch)ch.innerHTML=DICT?'🎤 Ses kontrolü açık':'👂 Anne-baba dinliyor';
 }
 function saySet(st){if(!SAY)return;SAY.state=st;sayCtl();}
@@ -2416,13 +2429,19 @@ function micBroken(){
     '<p>Dosya büyük ihtimalle bir uygulamanın içinde açıldı (WhatsApp, Dosyalar ya da Claude). Ses kontrolü sadece <b>Chrome uygulamasının kendisinde</b> çalışır.</p>'+
     '<div class="res-btns one"><button class="rbtn main" data-act="sayparent"><span class="em">👂</span>Tamam</button></div></div>');
 }
+var LISTEN_MS=9000;   /* çocuk geç başlayabilir: toplam 9 saniye dinler */
 function sayMic(){
   if(!SAY||!DICT)return;
-  if(SAY.state==='listen'){micStop();sayForceJudge(700);return;}
+  if(SAY.state==='listen'){SAY.ustop=true;micStop();sayForceJudge(700);return;}
   if(SAY.state==='start')return;
   if(SAY.state!=='ready'&&SAY.state!=='wait')return;
-  hush();trStop();SAY.tok++;SAY.heard='';SAY.partial='';
+  hush();trStop();SAY.heard='';SAY.partial='';SAY.lt0=Date.now();SAY.rs=0;SAY.ustop=false;SAY.snd=false;
   var h=$('#heard');if(h)h.textContent='';
+  micGo();
+}
+function micGo(){
+  if(!SAY||!DICT)return;
+  SAY.tok++;clearTimeout(SAY.fj);
   saySet('start');sayBubble('⏳');
   var opts=DICT_NOLANG?{}:{language:'en'},tk=SAY.tok,me=SAY,started=false;
   var wd=setTimeout(function(){if(!started&&SAY===me&&SAY.tok===tk&&SAY.state==='start')micBroken();},4000);
@@ -2431,7 +2450,7 @@ function sayMic(){
     if(SAY!==me||SAY.tok!==tk||SAY.state!=='start'){micKill();return;}
     saySet('listen');sayBubble('👂');
     clearTimeout(SAY.timer);
-    SAY.timer=setTimeout(function(){if(SAY===me&&SAY.state==='listen'){micStop();sayForceJudge(800);}},5000);
+    SAY.timer=setTimeout(function(){if(SAY===me&&SAY.state==='listen'){SAY.ustop=true;micStop();sayForceJudge(800);}},Math.max(2500,LISTEN_MS-(Date.now()-SAY.lt0)));
   },function(err){
     started=true;clearTimeout(wd);
     if(SAY!==me)return;
@@ -2445,6 +2464,7 @@ function sayMic(){
 }
 function sayHeard(text,partial){
   if(!SAY||SAY.state!=='listen')return;
+  if(text&&!SAY.snd){SAY.snd=true;sayCtl();}
   if(partial)SAY.partial=text||'';else{SAY.heard=(SAY.heard+' '+(text||'')).trim();SAY.partial='';}
   var all=(SAY.heard+' '+(SAY.partial||'')).trim(),h=$('#heard');
   if(h)h.innerHTML=all?'Duyduğum: <b>'+all.replace(/</g,'&lt;')+'</b>':'';
@@ -2453,16 +2473,25 @@ function sayHeard(text,partial){
 }
 function sayDictState(state,reason){
   if(!SAY||SAY.state!=='listen')return;
-  if(state==='idle'){clearTimeout(SAY.timer);clearTimeout(SAY.fj);sayJudge(reason);}
+  if(state==='sound'){if(!SAY.snd){SAY.snd=true;sayCtl();}return;}
+  if(state==='idle'){
+    clearTimeout(SAY.timer);clearTimeout(SAY.fj);
+    var heard=(SAY.heard+' '+(SAY.partial||'')).trim();
+    /* hiç ses gelmeden kapandıysa (Karel henüz başlamadı) sessizce yeniden dinle */
+    if(!heard&&!SAY.snd&&!SAY.ustop&&SAY.rs<3&&reason!=='not_granted'&&Date.now()-SAY.lt0<LISTEN_MS-1500){SAY.rs++;micGo();return;}
+    sayJudge(reason);
+  }
 }
 function sayJudge(reason){
   var w=SAY.items[SAY.i],heard=(SAY.heard+' '+(SAY.partial||'')).trim(),sc=sayScore(w[0],heard);
   if(sc>=0.6){sayGood();return;}
   if(!heard){  /* hiç ses gelmedi: deneme sayılmaz */
-    saySet('wait');sayBubble('👂 ❓');
+    SAY.miss++;SAY.deaf=(SAY.deaf||0)+1;var loud=SAY.snd;
+    saySet('wait');sayBubble(loud?'🔊 ❓':'👂 ❓');
+    if(SAY.deaf>=2)sayTip();
     if(reason==='not_granted'){DICT=null;toast('🎤 Mikrofon kullanılamıyor.<br><small>Karel söylesin, siz dinleyip 👍 ya da 🔁 seçin.</small>');sayCtl();}
     ++SAY.tok;var tk=SAY.tok;
-    sayFb(sayEN()?[{k:'e:Your turn!'}]:[],'Duyamadım. Hadi, sen söyle!',function(){
+    sayFb(sayEN()?[{k:'e:Your turn!'}]:[],loud?'Tam anlayamadım. Biraz daha yüksek sesle söyle!':'Duyamadım. Hadi, yüksek sesle söyle!',function(){
       say(SAY.m==='m'?[]:[SAY.m==='r'&&SAY.tries<2?{k:'e:'+recallQ(EN[SAY.gi])}:enSay(w)],function(){if(SAY&&SAY.tok===tk){sayBubble('🎤 ?');saySet('ready');}});
     });
     return;
@@ -2471,7 +2500,7 @@ function sayJudge(reason){
 }
 function sayWrong(){
   if(!SAY)return;var w=SAY.items[SAY.i];
-  SAY.tries++;sfx('boing');
+  SAY.tries++;SAY.miss++;SAY.deaf=0;sfx('boing');
   if(SAY.tries>=2)sayReveal();   /* Sen Bil'de ikinci yanlıştan sonra yazısı da görünsün */
   saySet('wait');sayBubble('🔁 <b class="fbt no">Tekrar</b>');++SAY.tok;var tk=SAY.tok;
   var hint=SAY.m!=='m'||SAY.tries>=2;   /* Orta'da kelimeyi ancak 2. yanlıştan sonra ipucu olarak okur */
@@ -2489,12 +2518,23 @@ function sayGood(){
   sfx('ding');++SAY.tok;var tk=SAY.tok;
   sayFb(sayEN()?[praise()]:[],'Aferin! Doğru söyledin.',function(){if(SAY&&SAY.tok===tk)SAY.nt=setTimeout(sayNext,500);});
 }
-function sayDone(){if(!SAY||SAY.state!=='ready')return;sayGood();}
+function sayDone(){
+  if(!SAY||SAY.state==='good')return;
+  if(SAY.state!=='ready'&&!(DICT&&SAY.miss>0))return;   /* mikrofonlu ekranda anne-baba onayı: ilk kaçırmadan sonra */
+  hush();trStop();clearTimeout(SAY.timer);clearTimeout(SAY.fj);if(DICT&&DICT.active())micKill();SAY.tok++;sayGood();
+}
+/* telefon Karel'i iki kez duymadı: anne-babaya kısa yol göster (oyun başına bir kez) */
+var SAYTIP=false;
+function sayTip(){
+  if(SAYTIP)return;SAYTIP=true;
+  toast('📱 <b>Telefonu Karel’e yaklaştırın</b><br><small>Mikrofon telefonun <b>alt ucunda</b>. Karel bir karış uzaktan, yüksek sesle söylesin.<br>Telefon yine duymazsa yeşil <b>👍</b> düğmesine basın.</small>');
+  var t=$('#toast');if(t){clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove('show');},6500);}
+}
 function saySkip(){if(!SAY||SAY.state==='good')return;hush();trStop();clearTimeout(SAY.timer);clearTimeout(SAY.fj);clearTimeout(SAY.nt);if(DICT&&DICT.active())micKill();SAY.tok++;sayNext();}
 function sayRetry(){if(!SAY||SAY.state!=='ready')return;sayWrong();}
 function sayNext(){
   if(!SAY||screen!=='ensay')return;
-  SAY.i++;SAY.tries=0;SAY.heard='';SAY.partial='';
+  SAY.i++;SAY.tries=0;SAY.heard='';SAY.partial='';SAY.miss=0;SAY.deaf=0;SAY.snd=false;
   if(SAY.i>=SAY.items.length){
     var n=SAY.items.length,f=SAY.first,gi=SAY.gi,m=SAY.m,r=f/n;sayEnd();
     finishEn(gi,m,r>=0.85?3:r>=0.6?2:1,n+' tanesinden '+f+' tanesini ilk denemede söyledi');
