@@ -767,6 +767,32 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .nameedit input:focus{outline:none;border-color:#3b82f6}
 .nsave{border:0;border-radius:14px;padding:0 14px;font:inherit;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#3b82f6,#1d4ed8)}
 .nsave.ok{background:linear-gradient(135deg,#22c55e,#15803d)}
+
+.memhud{display:flex;justify-content:center;gap:12px;margin:2px 0 6px}
+.memhud span{background:#fff;border-radius:99px;padding:6px 14px;font-weight:800;font-size:15px;box-shadow:var(--shadow)}
+.memtip{text-align:center;font-weight:800;color:color-mix(in srgb,var(--h) 80%,#000);margin:4px 0 8px;font-size:15px}
+.memgrid{display:grid;gap:10px;margin:0 auto;max-width:440px}
+.memgrid.c4{grid-template-columns:repeat(4,minmax(0,1fr))}.memgrid.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.mcard{position:relative;aspect-ratio:3/4;border:0;background:none;padding:0;perspective:700px;font-family:inherit}
+.mc-in{position:absolute;inset:0;transition:transform .5s cubic-bezier(.3,1.35,.5,1);transform-style:preserve-3d}
+.mcard.open .mc-in{transform:rotateY(180deg)}
+.mc-f,.mc-b{position:absolute;inset:0;border-radius:18px;-webkit-backface-visibility:hidden;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.mc-b{background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.35) 0 12%,transparent 13%),radial-gradient(circle at 75% 70%,rgba(255,255,255,.25) 0 9%,transparent 10%),linear-gradient(135deg,#8b5cf6,#ec4899);border:3px solid #fff;box-shadow:0 5px 12px rgba(0,0,0,.18)}
+.mcb-in{font-size:30px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.mc-f{background:#fff;transform:rotateY(180deg);border:3px solid #f5d0fe;box-shadow:0 5px 12px rgba(0,0,0,.12)}
+.mc-f .ar{font-size:46px;line-height:1.3;color:var(--ink)}
+.mc-f .wtxt.mword{font-size:38px;line-height:1.6}
+.mcard.done .mc-f{border-color:#22c55e;background:#f0fdf4;box-shadow:0 0 0 4px rgba(34,197,94,.25)}
+.mcard.done .mc-f::after{content:'✓';position:absolute;right:6px;top:4px;font-size:16px;font-weight:900;color:#16a34a}
+.mcard.done{animation:pop .4s}
+.mcard.nope .mc-in{animation:mshake .4s}
+@keyframes mshake{0%,100%{transform:rotateY(180deg) translateX(0)}25%{transform:rotateY(180deg) translateX(-6px)}75%{transform:rotateY(180deg) translateX(6px)}}
+.memvis{display:flex;gap:6px;direction:rtl}
+.memvis .ar,.memvis .wtxt{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:48px;padding:6px 6px 0;box-sizing:border-box;background:#fff;border-radius:10px;font-size:26px;line-height:1.5;overflow:visible;box-shadow:0 1px 3px rgba(0,0,0,.12);color:var(--ink)}
+.memvis .wtxt{font-size:24px}
+.kic.kmem{display:flex;gap:3px;align-items:center;justify-content:center;direction:rtl}
+.kic.kmem i{font-style:normal;font-family:'Amiri','Noto Naskh Arabic',serif;width:22px;height:30px;border-radius:6px;background:#fff;border:2px solid #f5d0fe;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;color:var(--ink)}
+.kic.kmem i.bk{background:linear-gradient(135deg,#8b5cf6,#ec4899);border-color:#fff}
 </style>
 </head>
 <body>
@@ -885,7 +911,7 @@ function normState(d){
   var s=freshState();if(!d||typeof d!=='object')return s;
   s.wallet=Math.max(0,Math.floor(+d.wallet||0));s.total=Math.max(0,Math.floor(+d.total||0));
   s.seq=Math.floor(+d.seq||0);s.upd=+d.upd||0;
-  if(d.best&&typeof d.best==='object'){for(var k in d.best){var v=Math.floor(+d.best[k]||0);if(v>0&&/^(\d+|e-[a-z0-9]+|h-[eiuacsk]):[kozbxsrmwv]$/.test(k))s.best[k]=Math.min(3,v);}}
+  if(d.best&&typeof d.best==='object'){for(var k in d.best){var v=Math.floor(+d.best[k]||0);if(v>0&&/^(\d+|e-[a-z0-9]+|h-[eiuacskm]):[kozbxsrmwv]$/.test(k))s.best[k]=Math.min(3,v);}}
   if(Array.isArray(d.garden)){
     s.garden=d.garden.filter(function(g){return g&&ITEM[g.t];}).slice(0,60).map(function(g){
       return {id:String(g.id||('g'+(++s.seq))),t:g.t,x:clamp(+g.x||50,1,99),y:clamp(+g.y||70,4,98)};
@@ -2040,6 +2066,8 @@ function openScreen(o,extra){
   else if(o.s==='hklearn')openHkLearn(o.h);
   else if(o.s==='hkmodes')openHkModes(o.h);
   else if(o.s==='ders')openDers(o.h,o.t);
+  else if(o.s==='hafiza')openMemMenu();
+  else if(o.s==='mem')startMem(o.m);
   else if(o.s==='learn')openLearn(o.g);
   else if(o.s==='mixlearn')openMixLearn();
   else if(o.s==='fmixlearn')openFmixLearn();
@@ -2688,14 +2716,14 @@ function hkDraw(h,n){  /* her harf sırayla gelsin */
   while(out.length<n){if(!HK_DECK[h].length)HK_DECK[h]=shuffle(LETTERS);var l=HK_DECK[h].pop();if(out.indexOf(l)<0)out.push(l);else HK_DECK[h].unshift(l);}
   return out;
 }
-function hkOrder(h){return h==='a'?['k','o','z','b']:(h==='c'||h==='s'||h==='k')?['w','v']:['k','o','b','w','v'];}
+function hkOrder(h){return h==='a'||h==='m'?(h==='m'?['k','o','z']:['k','o','z','b']):(h==='c'||h==='s'||h==='k')?['w','v']:['k','o','b','w','v'];}
 var HKD={
   one:{k:'4 balon · 10 hece',o:'6 balon · benzer harfler',b:'Uçan balonlar'},
   a:{k:'Aynı harf, 3 hareke: hangisi?',o:'6 balon · karışık harekeler',z:'Sadece işaret: hangi hareke?',b:'Uçan balonlar · karışık'}
 };
 var HKVIS={k:'🎈🎈🎈',o:'🎈🎈🎈🎈🎈🎈',z:'ـَ ـِ ـُ',b:'🎈💨 🎈💨'};
 function hkStars(h){var n=0;hkOrder(h).forEach(function(m){n+=ST.best['h-'+h+':'+m]||0;});return n;}
-var HK_ALL=['e','i','u','a','k','c','s'],HK_SET=['e','i','u','a','k'];
+var HK_ALL=['e','i','u','a','k','c','s','m'],HK_SET=['e','i','u','a','k'];
 function hkStarsOf(l){var n=0;l.forEach(function(h){n+=hkStars(h);});return n;}
 function hkMaxOf(l){var n=0;l.forEach(function(h){n+=hkOrder(h).length*3;});return n;}
 function hkStarsAll(){return hkStarsOf(HK_ALL);}
@@ -2716,7 +2744,9 @@ function renderKuran(){
     '<button class="ktopic" style="--h:'+HK_HUE.c+'" data-act="ders" data-h="c"><span class="kno">3</span><span class="kic ar">'+dGlyph('ن','ْ',DINFO.c.col)+' '+dGlyph('ب','ْ',DINFO.c.col)+'</span>'+
       '<span class="ktx"><b>Cezim</b><small>Harf, önceki harfe bağlanarak okunur</small><span class="kst">★ '+hkStars('c')+' / '+hkMaxOf(['c'])+'</span></span><span class="kgo">›</span></button>'+
     '<button class="ktopic" style="--h:'+HK_HUE.s+'" data-act="ders" data-h="s"><span class="kno">4</span><span class="kic ar">'+dGlyph('ب','ّ',DINFO.s.col)+' '+dGlyph('ن','ّ',DINFO.s.col)+'</span>'+
-      '<span class="ktx"><b>Şedde</b><small>Harf iki kere okunur</small><span class="kst">★ '+hkStars('s')+' / '+hkMaxOf(['s'])+'</span></span><span class="kgo">›</span></button>';
+      '<span class="ktx"><b>Şedde</b><small>Harf iki kere okunur</small><span class="kst">★ '+hkStars('s')+' / '+hkMaxOf(['s'])+'</span></span><span class="kgo">›</span></button>'+
+    '<button class="ktopic" style="--h:#db2777" data-act="hafiza"><span class="kno">5</span><span class="kic kmem"><i>ب</i><i class="bk"></i><i>ب</i></span>'+
+      '<span class="ktx"><b>Hafıza Oyunu</b><small>Kartları çevir, aynısını bul</small><span class="kst">★ '+hkStars('m')+' / '+hkMaxOf(['m'])+'</span></span><span class="kgo">›</span></button>';
   app.innerHTML=h;window.scrollTo(0,0);
 }
 
@@ -3355,6 +3385,115 @@ BEH.ninja={m:'walk',v:7,face:'F',hop:1};BEH.itfaiyeci={m:'walk',v:4.5,face:'F',h
 BEH.buyucu={m:'walk',v:3,face:'F',hop:1};BEH.peri={m:'flutter',v:6,face:'F'};BEH.prens={m:'walk',v:3.5,face:'F',hop:1};BEH.prenses={m:'walk',v:3.5,face:'F',hop:1};
 BEH.ejderha={m:'flutter',v:6,face:'L'};BEH.dinozor={m:'walk',v:2.5,face:'L'};BEH.unicorn={m:'walk',v:6,face:'L'};BEH.ufo={m:'fly',v:8,face:'F'};
 
+
+/* ================= KUR'AN: HAFIZA OYUNU (ters kartlardan aynı ikiliyi bul) ================= */
+/* Kolay: harfler (8 kart) · Orta: harekeli harfler (12 kart) · Zor: iki harfli harekeli kelimeler (12 kart).
+   Her kart açılınca okunuşu duyulur. Yıldız anahtarı: h-m:k / h-m:o / h-m:z */
+var MEMLV={
+  k:{n:'Kolay',em:'🟢',pairs:4,cols:4,peek:2600,d:'Harfler · 8 kart'},
+  o:{n:'Orta',em:'🟡',pairs:6,cols:4,peek:1800,d:'Harekeli harfler · 12 kart'},
+  z:{n:'Zor',em:'🔴',pairs:6,cols:3,peek:1200,d:'İki harfli kelimeler · 12 kart'}
+};
+var MEMHUE='#db2777';
+function memLetters(n){  /* birbirine benzemeyen ve aynı okunmayan harfler */
+  var out=[];shuffle(LETTERS).forEach(function(l){if(out.length<n&&out.every(function(x){return !sameSnd(x,l)&&!sameFam(x,l);}))out.push(l);});
+  return out;
+}
+function memPairs(m){
+  if(m==='k')return memLetters(4).map(function(l){return {html:'<span class="ar">'+l.c+'</span>',say:[NM(l)]};});
+  if(m==='o'){  /* 4 harf × 3 hareke içinden 6 farklı kart: aynı harfin üstünlü-esreli hâli yan yana gelebilir */
+    var ls=memLetters(4),all=[];ls.forEach(function(l){HKS.forEach(function(h){all.push(hkItem(l,h));});});
+    return shuffle(all).slice(0,6).map(function(it){return {html:'<span class="ar">'+hkGlyph(it)+'</span>',say:[hkSay(it)]};});
+  }
+  var seen={},out=[],tries=0;   /* Zor: iki harfli kelime (ikinci harf elif olmaz) */
+  while(out.length<6&&tries++<400){
+    var a=LETTERS[Math.floor(Math.random()*28)],b=LETTERS[1+Math.floor(Math.random()*27)];
+    var ha=HKS[Math.floor(Math.random()*3)],hb=HKS[Math.floor(Math.random()*3)],t=a.c+HK[ha].mark+b.c+HK[hb].mark;
+    if(seen[t]||sameSnd(a,b))continue;seen[t]=1;
+    var ia=hkItem(a,ha),ib=hkItem(b,hb);
+    out.push({html:'<span class="wtxt mword">'+t+'</span>',say:[hkSay(ia),hkSay(ib)]});
+  }
+  return out;
+}
+function memStarsTxt(m){return starHtml(ST.best['h-m:'+m]||0);}
+function openMemMenu(){
+  setScreen('hafiza');hush();stopSeq();stopGame();closeModal();hkWarm();
+  document.documentElement.style.setProperty('--h',MEMHUE);
+  var ex={k:'<span class="ar">ب</span><span class="ar">ب</span>',o:'<span class="ar">'+hkGlyph(hkItem(LETTERS[1],'e'))+'</span><span class="ar">'+hkGlyph(hkItem(LETTERS[1],'e'))+'</span>',
+    z:'<span class="wtxt">بَتَ</span><span class="wtxt">بَتَ</span>'};
+  var h='<div class="bar">'+navBtns()+'<div class="btitle">🧠 Hafıza Oyunu<small>Kartları çevir, aynısını bul</small></div>'+walletChip(true)+'</div>'+
+    '<div class="hero small">👨‍👩‍👦 Kartlar ters duruyor. İki kart aç; aynıysa açık kalır, değilse geri döner. Her kart açılınca okunur. Başta kartlar kısa bir süre gösterilir.</div>'+
+    '<div class="picker">'+['k','o','z'].map(function(m){var L=MEMLV[m];
+      return '<button class="mode '+m+'" data-act="memstart" data-m="'+m+'"><span class="big">'+L.em+'</span>'+
+        '<span><div class="mt">'+L.n+'</div><div class="md">'+L.d+'</div><div class="vis memvis">'+ex[m]+'</div></span>'+
+        '<span class="mr"><span class="rw">⭐ '+(1+MODES[m].bonus)+'–'+(3+MODES[m].bonus)+'</span><span class="bs">'+memStarsTxt(m)+'</span></span></button>';}).join('')+'</div>';
+  app.innerHTML=h;window.scrollTo(0,0);
+}
+var MEM=null;
+function startMem(m){
+  setScreen('mem');hush();stopSeq();stopGame();closeModal();hkWarm();
+  document.documentElement.style.setProperty('--h',MEMHUE);
+  var L=MEMLV[m]||MEMLV.k,pairs=memPairs(m),cards=[];
+  pairs.forEach(function(p,i){cards.push({p:i,html:p.html,say:p.say});cards.push({p:i,html:p.html,say:p.say});});
+  cards=shuffle(cards);
+  MEM={m:m,cards:cards,open:[],done:0,moves:0,miss:0,lock:true,pairs:pairs.length,tok:(MEM?MEM.tok:0)+1};
+  app.innerHTML='<div class="bar">'+navBtns()+'<div class="btitle">🧠 Hafıza · '+L.n+'<small>'+L.d+'</small></div>'+walletChip(false)+'</div>'+
+    '<div class="memhud"><span id="memdone">✅ 0 / '+pairs.length+'</span><span id="memmoves">👆 0 hamle</span></div>'+
+    '<div class="memtip" id="memtip">👀 İyi bak, kartlar birazdan dönecek!</div>'+
+    '<div class="memgrid c'+L.cols+'" id="memgrid">'+cards.map(function(c,i){
+      return '<button class="mcard open" id="mc-'+i+'" data-act="memflip" data-i="'+i+'"><span class="mc-in">'+
+        '<span class="mc-b"><span class="mcb-in">🌙</span></span><span class="mc-f">'+c.html+'</span></span></button>';}).join('')+'</div>';
+  window.scrollTo(0,0);
+  var me=MEM;
+  setTimeout(function(){  /* kısa süre göster, sonra çevir */
+    if(MEM!==me||screen!=='mem')return;
+    var cs=document.querySelectorAll('.mcard');for(var k=0;k<cs.length;k++)cs[k].classList.remove('open');
+    var t=$('#memtip');if(t)t.textContent='🃏 İki kart aç, aynısını bul!';
+    sfx('pop');setTimeout(function(){if(MEM===me)me.lock=false;},450);
+  },L.peek);
+}
+function memHud(){var a=$('#memdone'),b=$('#memmoves');if(a)a.textContent='✅ '+MEM.done+' / '+MEM.pairs;if(b)b.textContent='👆 '+MEM.moves+' hamle';}
+function memFlip(i){
+  if(!MEM||MEM.lock)return;var c=MEM.cards[i],el=$('#mc-'+i);
+  if(!c||c.open||c.done||!el)return;
+  c.open=true;el.classList.add('open');hush();say(c.say);
+  MEM.open.push(i);
+  if(MEM.open.length<2)return;
+  MEM.moves++;MEM.lock=true;memHud();
+  var i1=MEM.open[0],i2=MEM.open[1],a=MEM.cards[i1],b=MEM.cards[i2],me=MEM,wait=c.say.length>1?1500:1000;
+  MEM.open=[];
+  if(a.p===b.p){
+    setTimeout(function(){
+      if(MEM!==me)return;a.done=b.done=true;me.done++;memHud();
+      [i1,i2].forEach(function(j){var e=$('#mc-'+j);if(e){e.classList.add('done');var r=e.getBoundingClientRect();confetti(r.left+r.width/2,r.top+r.height/2,14);}});
+      sfx('ding');me.lock=false;
+      if(me.done===me.pairs)setTimeout(function(){if(MEM===me)memFinish();},900);
+    },wait-300);
+  }else{
+    setTimeout(function(){if(MEM!==me)return;[i1,i2].forEach(function(j){var e=$('#mc-'+j);if(e){e.classList.remove('nope');void e.offsetWidth;e.classList.add('nope');}});},wait-450);
+    setTimeout(function(){
+      if(MEM!==me)return;me.miss++;a.open=b.open=false;
+      [i1,i2].forEach(function(j){var e=$('#mc-'+j);if(e)e.classList.remove('open','nope');});
+      me.lock=false;
+    },wait+250);
+  }
+}
+function memFinish(){
+  var m=MEM.m,p=MEM.pairs,base=MEM.miss<=Math.ceil(p/2)?3:MEM.miss<=p+1?2:1,earn=base+MODES[m].bonus,key='h-m:'+m;
+  if(base>(ST.best[key]||0))ST.best[key]=base;
+  ST.wallet+=earn;ST.total+=earn;saveState();
+  var s='<div class="res-stars">';for(var k=0;k<3;k++)s+='<span class="st'+(k<base?' on':'')+'" style="animation-delay:'+(0.25+k*0.25)+'s">★</span>';
+  var ord=['k','o','z'],nx=ord[ord.indexOf(m)+1];
+  var next=nx?'<button class="rbtn" data-act="memstart" data-m="'+nx+'"><span class="em">'+MEMLV[nx].em+'</span>'+MEMLV[nx].n+'</button>':
+    '<button class="rbtn" data-act="kuran"><span class="em">🕌</span>Kur\'an</button>';
+  s+='</div><div class="res-face">'+(base===3?'🏆':base===2?'🥳':'😊')+'</div><div class="earn">+'+earn+' ⭐</div>'+
+    '<p>'+p+' eşin hepsini buldun · '+MEM.moves+' hamle.<br>Toplam yıldız: <b>⭐ '+ST.wallet+'</b></p><div class="res-btns g4">'+
+    '<button class="rbtn main" data-act="memstart" data-m="'+m+'"><span class="em">🔁</span>Tekrar</button>'+
+    '<button class="rbtn" data-act="shop"><span class="em">🏪</span>Dükkan</button>'+next+
+    '<button class="rbtn" data-act="hafiza"><span class="em">🧠</span>Seviyeler</button></div>';
+  modal(s);sfx('win');confetti(0,0,70,true);paintWallet(true);
+}
+
 /* ================= ANA EKRAN (Kur'an · İngilizce · Bahçe) ================= */
 var KID='Karel';
 function kuranStars(){var n=0;for(var k in ST.best){if(/^\d+:/.test(k))n+=ST.best[k]||0;}return n;}
@@ -3402,6 +3541,9 @@ document.addEventListener('click',function(e){
   else if(act==='hkdplay')hkDemoPlay();
   else if(act==='ders')goTo({s:'ders',h:b.getAttribute('data-h'),t:b.getAttribute('data-t')||'anl'});
   else if(act==='dtab')dTab(b.getAttribute('data-t'));
+  else if(act==='hafiza')goTo({s:'hafiza'});
+  else if(act==='memstart')goTo({s:'mem',m:b.getAttribute('data-m')});
+  else if(act==='memflip')memFlip(+b.getAttribute('data-i'));
   else if(act==='lplay')dToggle();
   else if(act==='lprev'){if(D)dRun(D.si-1);}
   else if(act==='lnext'){if(D)dRun(D.si+1);}
