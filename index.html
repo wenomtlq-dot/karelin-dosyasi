@@ -807,7 +807,7 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .cpc.stat{position:static;display:inline-flex;width:auto;height:auto;font-size:56px;transition:none;vertical-align:middle}
 .cpc.stat.tiny{font-size:24px;-webkit-text-stroke:1.2px #3b2a1a}
 .hkc-big.cbig{background:linear-gradient(135deg,#f3dfb5,#d9b07a);border-radius:20px}
-.cboard{position:relative;box-sizing:border-box;width:min(100%,400px);aspect-ratio:1;margin:8px auto 4px;border-radius:14px;overflow:hidden;border:6px solid #8b5a2b;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);background:#8b5a2b;box-shadow:0 8px 20px rgba(0,0,0,.22)}
+.cboard{position:relative;box-sizing:border-box;width:min(100%,400px);aspect-ratio:1;margin:8px auto 4px;border-radius:14px;overflow:hidden;border:6px solid #8b5a2b;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));grid-template-rows:repeat(8,minmax(0,1fr));background:#8b5a2b;box-shadow:0 8px 20px rgba(0,0,0,.22)}
 .lboard.cl .cboard{margin-top:46px}
 .sq{position:relative}
 .sq.l{background:#f3dfb5}.sq.d{background:#b9874f}
@@ -831,6 +831,15 @@ h3.sec small{font-size:13px;font-weight:700;color:var(--muted);margin-left:4px}
 .gi.shiny .gf::before{content:'';position:absolute;left:50%;top:55%;width:150%;height:110%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,215,64,.55),rgba(255,215,64,0) 65%);animation:shine 1.8s ease-in-out infinite;z-index:-1;pointer-events:none}
 .gi.shiny .gf::after{content:'✨';position:absolute;right:-12%;top:-8%;font-size:.32em;animation:twk 1.2s ease-in-out infinite;pointer-events:none}
 @keyframes shine{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.9)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+.cpc.main.drag{pointer-events:auto;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none}
+.cpc.main.dragging{transition:none;z-index:20;transform:scale(1.3);filter:drop-shadow(0 8px 8px rgba(0,0,0,.35));cursor:grabbing}
+.sq.hov{box-shadow:inset 0 0 0 4px rgba(37,99,235,.8)}
+.cdrag{text-align:center;font-size:13.5px;font-weight:700;color:var(--muted);margin:6px 0}
+.cpc.dim{opacity:.28}
+.cpc.glow{z-index:4;filter:drop-shadow(0 0 6px rgba(250,204,21,.95)) drop-shadow(0 3px 3px rgba(0,0,0,.3))}
+.sq.chome{box-shadow:inset 0 0 0 4px var(--mc,#dc2626)}
+.sq.cnb{box-shadow:inset 0 0 0 999px rgba(250,204,21,.5)}
+.cnum{position:absolute;right:2px;top:2px;min-width:16px;height:16px;padding:0 3px;border-radius:99px;background:var(--mc,#dc2626);color:#fff;font-size:11px;font-weight:900;line-height:16px;text-align:center;z-index:6;animation:cdot .3s}
 .herob.lock{opacity:.6;filter:grayscale(.5)}
 .herob.lock i{color:#b45309}
 </style>
@@ -3602,15 +3611,24 @@ function cPiece(id,p,s,cls){return '<div class="cpc '+(cls||'w')+'" id="'+id+'" 
 function cClear(bid,keep){
   var b=$('#'+bid);if(!b)return;
   var q=b.querySelectorAll('.sq');for(var i=0;i<q.length;i++)q[i].className=q[i].className.split(' ').slice(0,2).join(' ');
+  var nn=b.querySelectorAll('.cnum');for(var j=0;j<nn.length;j++)nn[j].remove();
   if(!keep){var o=b.querySelectorAll('.cpc,.cstar');for(var k=0;k<o.length;k++)o[k].remove();}
 }
 function cMark(bid,s,cls){var e=$('#'+bid+'-'+s);if(e){e.classList.remove(cls);void e.offsetWidth;e.classList.add(cls);}return e;}
-function cSet(bid,st){  /* st: {p,at,own:[],enemy:[],star} */
+var CSTART='RNBQKBNR';
+function cSet(bid,st){  /* st: {p,at,own:[],enemy:[],star,drag,full} */
   var b=$('#'+bid);if(!b)return;cClear(bid);
-  var h='';(st.own||[]).forEach(function(s,i){h+=cPiece(bid+'-o'+i,'P',s,'w sm');});
+  var h='';
+  if(st.full){  /* oyunun başlangıç dizilişi: dersin taşı parlak, diğerleri soluk */
+    for(var f=0;f<8;f++){
+      [[0,CSTART.charAt(f),'w'],[1,'P','w'],[6,'P','b'],[7,CSTART.charAt(f),'b']].forEach(function(x){
+        h+=cPiece(bid+'-f'+f+x[0],x[1],sqN(f,x[0]),x[2]+(x[1]===st.p?' glow':' dim'));});
+    }
+    b.insertAdjacentHTML('beforeend',h);cSize();return;
+  }(st.own||[]).forEach(function(s,i){h+=cPiece(bid+'-o'+i,'P',s,'w sm');});
   (st.enemy||[]).forEach(function(s,i){h+=cPiece(bid+'-e'+i,'P',s,'b sm');});
   if(st.star)h+='<div class="cstar" id="'+bid+'-star" style="'+cPos(st.star)+'">⭐</div>';
-  if(st.at)h+=cPiece(bid+'-pc',st.p,st.at,'w main');
+  if(st.at)h+=cPiece(bid+'-pc',st.p,st.at,'w main'+(st.drag?' drag':''));
   b.insertAdjacentHTML('beforeend',h);cSize();
 }
 function cOcc(st){var o={};(st.own||[]).forEach(function(s){o[s]='w';});(st.enemy||[]).forEach(function(s){o[s]='b';});return o;}
@@ -3660,31 +3678,43 @@ function cTab(t,keepFlow){
 /* ---- 📖 anlatım ---- */
 var CLES={
   R:[{at:'d4',mode:'piece',t:'Bu taşın adı kale. Bir kuleye benzer.'},
+     {mode:'start',count:['a1','h1','a8','h8'],t:'Oyunun başında tahtada dört kale vardır: ikisi beyaz, ikisi siyah. Beyaz taşlar aşağıda, siyah taşlar yukarıda başlar.'},
+     {mode:'start',home:['a1','h1','a8','h8'],nb:['b1','g1','b8','g8'],t:'Kaleler tahtanın köşelerinde durur. Kalenin hemen yanında at vardır.'},
      {at:'d4',mode:'rays',t:'Kale dümdüz gider: ileri, geri, sağa ve sola.'},
      {at:'d4',mode:'area',x:['c5','e5','c3','e3'],t:'İstediği kadar uzağa gidebilir. Ama çapraz gidemez.'},
      {at:'d4',own:['d6','f4'],mode:'area',t:'Önünde bir taş varsa onun üstünden atlayamaz, orada durur.'},
      {at:'d4',mode:'area',t:'Unutma: kale dümdüz gider.'}],
   B:[{at:'d4',mode:'piece',t:'Bu taşın adı fil.'},
+     {mode:'start',count:['c1','f1','c8','f8'],t:'Oyunun başında dört fil vardır: ikisi beyaz, ikisi siyah. Beyaz taşlar aşağıda, siyah taşlar yukarıda başlar.'},
+     {mode:'start',home:['c1','f1','c8','f8'],nb:['b1','g1','b8','g8','d1','e1','d8','e8'],t:'Filler atların yanında durur. Öbür yanlarında vezir ve şah vardır.'},
      {at:'d4',mode:'rays',t:'Fil çapraz gider. Dört çapraz yöne, istediği kadar.'},
      {at:'d4',mode:'area',x:['d5','d3','c4','e4'],t:'Fil dümdüz gidemez.'},
      {at:'d4',mode:'color',t:'Fil hep aynı renkteki karelerde gezer. Bu fil hep koyu karelerde kalır.'},
      {at:'d4',mode:'area',t:'Unutma: fil çapraz gider.'}],
   N:[{at:'d4',mode:'piece',t:'Bu taşın adı at.'},
+     {mode:'start',count:['b1','g1','b8','g8'],t:'Oyunun başında dört at vardır: ikisi beyaz, ikisi siyah. Beyaz taşlar aşağıda, siyah taşlar yukarıda başlar.'},
+     {mode:'start',home:['b1','g1','b8','g8'],nb:['a1','h1','a8','h8','c1','f1','c8','f8'],t:'At, kalenin yanında durur. Öbür yanında fil vardır.'},
      {at:'d4',mode:'path',path:['d5','d6','e6'],t:'At, L harfi gibi gider: iki kare düz, sonra bir kare yana.'},
      {at:'d4',mode:'path',path:['e4','f4','f3'],t:'Başka yöne de olur: iki kare yana, bir kare aşağı.'},
      {at:'d4',mode:'rays',t:'Bak, at buradan bu sekiz kareye gidebilir.'},
      {at:'d4',own:['c3','d3','e3','c4','e4','c5','d5','e5'],mode:'area',t:'At, taşların üstünden atlayabilen tek taştır.'},
      {at:'d4',mode:'area',t:'Unutma: at, L harfi gibi gider.'}],
   Q:[{at:'d4',mode:'piece',t:'Bu taşın adı vezir. En güçlü taştır.'},
+     {mode:'start',count:['d1','d8'],t:'Her oyuncunun bir veziri vardır. Tahtada iki vezir olur: bir beyaz, bir siyah.'},
+     {mode:'start',home:['d1','d8'],nb:['e1','e8','c1','c8'],t:'Vezir en arka sırada, ortada durur. Beyaz vezir beyaz karede, siyah vezir siyah karede başlar. Hemen yanında şah vardır.'},
      {at:'d4',mode:'rays',dirs:'straight',t:'Vezir, kale gibi dümdüz gidebilir.'},
      {at:'d4',mode:'rays',dirs:'diag',t:'Fil gibi çapraz da gidebilir.'},
      {at:'d4',mode:'area',t:'Yani sekiz yöne, istediği kadar gidebilir.'},
      {at:'d4',mode:'area',t:'Unutma: vezir her yöne gider.'}],
   K:[{at:'d4',mode:'piece',t:'Bu taşın adı şah. En önemli taştır.'},
+     {mode:'start',count:['e1','e8'],t:'Her oyuncunun bir şahı vardır. Tahtada iki şah olur: bir beyaz, bir siyah.'},
+     {mode:'start',home:['e1','e8'],nb:['d1','d8','f1','f8'],t:'Şah en arka sırada, vezirin yanında durur. Öbür yanında fil vardır.'},
      {at:'d4',mode:'rays',t:'Şah her yöne gidebilir: ileri, geri, yanlara ve çapraz.'},
      {at:'d4',mode:'area',x:['d6','f6','b4','f4','d2','b6','b2','f2'],t:'Ama sadece bir kare gider.'},
      {at:'d4',mode:'area',t:'Unutma: şah her yöne, bir kare gider.'}],
   P:[{at:'d2',mode:'piece',t:'Bu taşın adı piyon. Küçük bir asker gibidir.'},
+     {mode:'start',count:['a2','b2','c2','d2','e2','f2','g2','h2','a7','b7','c7','d7','e7','f7','g7','h7'],t:'Oyunun başında sekiz beyaz, sekiz siyah piyon vardır.'},
+     {mode:'start',home:['a2','b2','c2','d2','e2','f2','g2','h2','a7','b7','c7','d7','e7','f7','g7','h7'],nb:['a1','b1','c1','d1','e1','f1','g1','h1','a8','b8','c8','d8','e8','f8','g8','h8'],t:'Piyonlar en öndeki sırada, diğer taşların önünde durur.'},
      {at:'d3',mode:'area',t:'Piyon sadece ileri gider, bir kare.'},
      {at:'d2',mode:'area',t:'Ama ilk hamlesinde isterse iki kare gidebilir.'},
      {at:'d4',mode:'area',x:['d3','c4','e4'],t:'Piyon geri ve yana gidemez.'},
@@ -3707,7 +3737,7 @@ function cRun(i){
   var me=CT,tok=CT.tok,sl=les[i],p=CT.p,occ=cOcc(sl);
   for(var k=0;k<les.length;k++){var d=$('#cd-'+k);if(d){d.classList.toggle('on',k===i);d.classList.toggle('done',k<i);}}
   var c=$('#ccap');if(c)c.textContent=sl.t;
-  cSet('cb',{p:p,at:sl.at,own:sl.own,enemy:sl.enemy});
+  if(sl.mode==='start')cSet('cb',{p:p,full:true});else cSet('cb',{p:p,at:sl.at,own:sl.own,enemy:sl.enemy});
   var pc=$('#cb-pc');if(pc){pc.classList.remove('pop');void pc.offsetWidth;pc.classList.add('pop');}
   /* tahtada göster */
   var steps=[],delay=120;
@@ -3716,12 +3746,21 @@ function cRun(i){
   else if(sl.mode==='path'){sl.path.forEach(function(s,k){steps.push([s,k===sl.path.length-1?'mv':'path']);});delay=500;}
   else if(sl.mode==='color'){for(var r=0;r<8;r++)for(var f=0;f<8;f++)if((f+r)%2===(sqF(sl.at)+sqR(sl.at))%2)steps.push([sqN(f,r),'colr']);delay=25;}
   (sl.x||[]).forEach(function(s){steps.push([s,'no']);});
+  if(sl.mode==='start'){  /* taşları tek tek say, yerlerini ve yanındakileri göster */
+    delay=(sl.count&&sl.count.length>8)?260:550;
+    (sl.count||[]).forEach(function(s,k){steps.push([s,'chome',k+1]);});
+    (sl.home||[]).forEach(function(s){steps.push([s,'chome']);});
+    (sl.nb||[]).forEach(function(s,k){steps.push([s,'cnb',0,k===0]);});
+  }
   var animDone=false,talkDone=false;
   function maybe(){if(animDone&&talkDone&&cLive(me,tok))setTimeout(function(){if(cLive(me,tok))cRun(i+1);},900);}
   (function st(j){
     if(!cLive(me,tok))return;
     if(j>=steps.length){animDone=true;maybe();return;}
-    cMark('cb',steps[j][0],steps[j][1]);if(steps[j][1]==='no'&&j>0&&steps[j-1][1]!=='no')delay=350;
+    var sqe=cMark('cb',steps[j][0],steps[j][1]);if(steps[j][1]==='no'&&j>0&&steps[j-1][1]!=='no')delay=350;
+    if(steps[j][2]&&sqe){sqe.insertAdjacentHTML('beforeend','<span class="cnum">'+steps[j][2]+'</span>');sfx('pop');}
+    if(steps[j][1]==='cnb'){var nq=steps[j][0],npc=$('#cb-f'+('abcdefgh'.indexOf(nq.charAt(0)))+(+nq.charAt(1)-1));if(npc)npc.classList.remove('dim');}
+    if(sl.mode==='start'){var cu=steps[j],nx=steps[j+1];delay=cu[2]?(sl.count.length>8?260:550):(cu[1]==='cnb'?60:80);if(nx&&nx[1]==='cnb'&&cu[1]!=='cnb')delay=900;}
     setTimeout(function(){st(j+1);},delay);
   })(0);
   var nt=$('#cnote');if(nt)nt.hidden=trOK();
@@ -3732,13 +3771,13 @@ function cToggle(){if(!CT)return;if(CT.playing){cStop();cPaint();}else cRun(CT.s
 
 /* ---- 👆 alıştırma: tek taş, gidebileceği kareler ---- */
 function cAliHTML(){
-  return '<div class="hero small">👆 Yeşil noktalar, '+CP[CT.p].n.toLowerCase()+' taşının gidebileceği kareler. Bir noktaya dokun, taş oraya gitsin.</div>'+
+  return '<div class="hero small">👆 Yeşil noktalar, '+CP[CT.p].n.toLowerCase()+' taşının gidebileceği kareler. Taşı parmağınla tutup bir noktaya <b>sürükle</b> ya da noktaya dokun.</div>'+
     '<div class="ccount" id="ccount"></div>'+cBoardHTML('ca')+
     '<div class="fmtools"><button id="enplay" data-act="cshuf">🔀 Başka kareye koy</button><button class="fmshuf" data-act="csay">🔊 Kural</button></div>'+
     '<button class="gobtn" id="gobtn" data-act="ctab" data-t="oyun"><span class="em">🎮</span>Oyuna geç</button>';
 }
 function cAliStart(at){
-  var p=CT.p,st={p:p,at:at,enemy:[]};
+  var p=CT.p,st={p:p,at:at,enemy:[],drag:true};
   if(p==='P'&&sqR(at)<6&&Math.random()<0.5){var f=sqF(at),d=Math.random()<0.5?-1:1;if(onB(f+d,sqR(at)+1))st.enemy=[sqN(f+d,sqR(at)+1)];}
   CT.ali=st;cSet('ca',st);cAliDots();
 }
@@ -3781,7 +3820,7 @@ function startChessGame(p,m){
   CG={p:p,m:m,round:0,total:CLV[m].rounds,miss:0,st:null,lock:false,saidNo:false,tok:(CG?CG.tok:0)+1};
   app.innerHTML='<div class="bar">'+navBtns()+'<div class="btitle"><span class="cpc w stat tiny">'+CP[p].g+'</span> '+CP[p].n+' · '+CLV[m].n+'<small>Yıldızı topla!</small></div>'+walletChip(false)+'</div>'+
     '<div class="zcount cz">⭐<div class="zbar"><i id="zfill" style="width:0%"></i></div><span id="zn">0/'+CG.total+'</span></div>'+
-    '<div class="ctip" id="ctip">'+CP[p].acc+' yıldıza götür!</div>'+cBoardHTML('cg');
+    '<div class="ctip" id="ctip">'+CP[p].acc+' yıldıza götür!</div>'+cBoardHTML('cg')+'<div class="cdrag">👆 Taşı parmağınla sürükle ya da gideceği kareye dokun.</div>';
   cSize();cRound();
   dTR(CP[p].acc+' yıldıza götür!',function(){});
 }
@@ -3792,7 +3831,7 @@ function cRandStart(p){
 function cRound(){
   var p=CG.p,m=CG.m,tries=0,st;
   while(tries++<200){
-    st={p:p,at:cRandStart(p),own:[],enemy:[]};
+    st={p:p,at:cRandStart(p),own:[],enemy:[],drag:true};
     if(m!=='k'&&p!=='P'&&p!=='N'&&Math.random()<0.6){  /* engel: kendi piyonumuz */
       var n=m==='z'?2:1;for(var k=0;k<n;k++){var o=sqN(Math.floor(Math.random()*8),Math.floor(Math.random()*8));if(o!==st.at&&st.own.indexOf(o)<0)st.own.push(o);}
     }
@@ -3862,6 +3901,42 @@ function cFinish(){
 }
 function cTap(b){var id=b.getAttribute('data-b'),s=b.getAttribute('data-sq');if(id==='ca')cAliTap(s);else if(id==='cg')cGameTap(s);}
 window.addEventListener('resize',cSize);
+
+/* taşı sürükle-bırak: parmakla tutup bir kareye bırakınca o kareye dokunulmuş gibi olur; olmazsa yerine geri kayar */
+var CDRAG=null;
+function cInner(bd){var r=bd.getBoundingClientRect();return {l:r.left+bd.clientLeft,t:r.top+bd.clientTop,w:bd.clientWidth,h:bd.clientHeight};}
+function cSqAt(bd,x,y){var r=cInner(bd),f=Math.floor((x-r.l)/(r.w/8)),rk=7-Math.floor((y-r.t)/(r.h/8));return onB(f,rk)?sqN(f,rk):null;}
+document.addEventListener('pointerdown',function(e){
+  var pc=e.target.closest&&e.target.closest('.cboard .cpc.main.drag');if(!pc)return;
+  var bd=pc.closest('.cboard'),bid=bd.id;
+  if(bid==='cg'&&(!CG||CG.lock))return;
+  if(bid==='ca'&&(!CT||!CT.ali))return;
+  e.preventDefault();
+  CDRAG={pc:pc,bd:bd,bid:bid,moved:false,x0:e.clientX,y0:e.clientY,hov:null};
+  try{pc.setPointerCapture(e.pointerId);}catch(_){}
+  pc.classList.add('dragging');
+});
+document.addEventListener('pointermove',function(e){
+  if(!CDRAG)return;var d=CDRAG;
+  if(!d.moved&&Math.abs(e.clientX-d.x0)+Math.abs(e.clientY-d.y0)<6)return;
+  d.moved=true;e.preventDefault();
+  var r=cInner(d.bd),sq=r.w/8;
+  d.pc.style.left=((e.clientX-r.l-sq/2)/r.w*100)+'%';d.pc.style.top=((e.clientY-r.t-sq*0.85)/r.h*100)+'%';
+  var s=cSqAt(d.bd,e.clientX,e.clientY);
+  if(s!==d.hov){if(d.hov){var o=$('#'+d.bid+'-'+d.hov);if(o)o.classList.remove('hov');}d.hov=s;if(s){var n=$('#'+d.bid+'-'+s);if(n)n.classList.add('hov');}}
+},{passive:false});
+function cDragEnd(e){
+  if(!CDRAG)return;var d=CDRAG;CDRAG=null;
+  d.pc.classList.remove('dragging');
+  if(d.hov){var o=$('#'+d.bid+'-'+d.hov);if(o)o.classList.remove('hov');}
+  var st=d.bid==='ca'?(CT&&CT.ali):(CG&&CG.st);if(!st)return;
+  if(!d.moved){cMoveTo(d.bid,d.bid+'-pc',st.at);return;}
+  var s=e.type==='pointercancel'?null:cSqAt(d.bd,e.clientX,e.clientY);
+  if(s&&s!==st.at){if(d.bid==='ca')cAliTap(s);else cGameTap(s);}
+  var st2=d.bid==='ca'?(CT&&CT.ali):(CG&&CG.st);if(st2)cMoveTo(d.bid,d.bid+'-pc',st2.at);   /* olmadıysa yerine döner */
+}
+document.addEventListener('pointerup',cDragEnd);
+document.addEventListener('pointercancel',cDragEnd);
 
 /* ================= ANA EKRAN (Kur'an · İngilizce · Bahçe) ================= */
 var KID='Karel';
